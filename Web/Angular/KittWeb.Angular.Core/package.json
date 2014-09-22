@@ -1,0 +1,9 @@
+﻿{
+    "name": "kittweb-angular-core",
+    "version": "0.0.0",
+    "dependencies": {
+        "gulp": "3.8.8",
+        "gulp-typescript": "2.0.0",
+        "minimist": "1.1.0"
+    }
+}

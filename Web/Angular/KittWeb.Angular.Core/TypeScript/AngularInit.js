@@ -1,28 +1,19 @@
 ﻿/// <reference path="../Scripts/typings/angularjs/angular.d.ts" />
+"use strict";
 define(["require", "exports"], function(require, exports) {
-    (function (KittWeb) {
-        (function (Angular) {
-            (function (Core) {
-                "use strict";
+    var AngularInit = (function () {
+        function AngularInit(appName) {
+            this.m_app = angular.module(appName, []);
+        }
+        AngularInit.$SCOPE = "$scope";
+        AngularInit.$COOKIE_STORE = "$cookieStore";
+        AngularInit.NG_COOKIES = "ngCookies";
+        return AngularInit;
+    })();
 
-                var AngularInit = (function () {
-                    function AngularInit(appName) {
-                        this.m_app = angular.module(appName, []);
-                    }
-                    AngularInit.$SCOPE = "$scope";
-                    return AngularInit;
-                })();
-                Core.AngularInit = AngularInit;
+    var ng;
 
-                
-
-                Core.IAngularConstants;
-                Core.ng;
-            })(Angular.Core || (Angular.Core = {}));
-            var Core = Angular.Core;
-        })(KittWeb.Angular || (KittWeb.Angular = {}));
-        var Angular = KittWeb.Angular;
-    })(exports.KittWeb || (exports.KittWeb = {}));
-    var KittWeb = exports.KittWeb;
+    
+    return AngularInit;
 });
 //# sourceMappingURL=AngularInit.js.map

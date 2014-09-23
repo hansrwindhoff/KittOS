@@ -1,25 +1,19 @@
 ﻿/// <reference path="../Scripts/typings/angularjs/angular.d.ts" />
 
-export module KittWeb.Angular.Core {
-    "use strict";
+"use strict";
 
-    export class AngularInit implements IAngularConstants {
-        private m_app: ng.IModule;
+class AngularInit {
+    private m_app: ng.IModule;
 
-        public static $SCOPE = "$scope";
+    public static $SCOPE = "$scope";
+    public static $COOKIE_STORE = "$cookieStore";
+    public static NG_COOKIES = "ngCookies";
 
-        constructor(appName: string) {
-            this.m_app = angular.module(appName, []);
-        }
+    constructor(appName: string) {
+        this.m_app = angular.module(appName, []);
     }
-
-    // Angular constants
-    export interface IAngularConstants { } // Interface skeleton
-    export interface IAngularConstantsStatic { // Static members
-        new (): IAngularConstants;
-        $SCOPE: string;
-    }
-
-    export var IAngularConstants: IAngularConstantsStatic;
-    export var ng: ng.IAngularStatic;
 }
+
+var ng: ng.IAngularStatic;
+
+export = AngularInit;

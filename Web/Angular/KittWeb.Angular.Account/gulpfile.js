@@ -41,7 +41,7 @@ gulp.task("ts", function (cb) {
     var tsResult = gulp
         .src(locations.sourceDirs)
         .pipe(flatten())
-        .pipe(ts(kwAngularTSProj));
+        .pipe(ts(tsProj));
 
     tsResult.dts.pipe(gulp.dest(locations.buildDir));
     return tsResult.js.pipe(gulp.dest(locations.buildDir));

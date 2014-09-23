@@ -31,13 +31,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Core\arrayUtilities.ts" />
+    <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Collections\hashtable.ts" />
     <TypeScriptCompile Include="Core\constants.ts" />
+    <TypeScriptCompile Include="Core\hash.ts" />
     <TypeScriptCompile Include="Core\indexable.ts" />
     <TypeScriptCompile Include="Core\references.ts" />
-    <TypeScriptCompile Include="Core\stringUtilities.ts" />
-    <TypeScriptCompile Include="_Temp\_.ts" />
+    <TypeScriptCompile Include="Core\Utilities\debug.ts" />
+    <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
+    <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

@@ -31,5 +31,18 @@ var TypeScript;
         return Errors;
     })();
     TypeScript.Errors = Errors;
+
+    var JsTypes = (function () {
+        function JsTypes() {
+        }
+        JsTypes.JsBoolean = "boolean";
+        JsTypes.JsFunction = "function";
+        JsTypes.JsNumber = "number";
+        JsTypes.JsObject = "object";
+        JsTypes.JsString = "string";
+        JsTypes.JsUndefined = "undefined";
+        return JsTypes;
+    })();
+    TypeScript.JsTypes = JsTypes;
 })(TypeScript || (TypeScript = {}));
 //# sourceMappingURL=constants.js.map

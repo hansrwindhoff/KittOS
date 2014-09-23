@@ -45,6 +45,7 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
     <TypeScriptCompile Include="TypeScript\AngularInit.ts" />
+    <TypeScriptCompile Include="TypeScript\references.ts" />
     <TypeScriptCompile Include="TypeScript\RequireMain.ts" />
   </ItemGroup>
   <ItemGroup />

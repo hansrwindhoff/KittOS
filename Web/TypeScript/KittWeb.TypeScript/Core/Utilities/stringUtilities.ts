@@ -1,5 +1,5 @@
-﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/arrayUtilities.ts
-///<reference path='references.ts' />
+﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/stringUtilities.ts
+///<reference path='../references.ts' />
 
 module TypeScript {
     export class StringUtilities {

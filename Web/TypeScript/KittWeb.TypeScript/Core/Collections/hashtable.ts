@@ -63,7 +63,7 @@ module TypeScript.Collections {
             var entry = this.findEntry(key, hashCode);
             if (entry !== null) {
                 if (throwOnExistingEntry) {
-                    throw Errors.argument('key', "Key was already in table.");
+                    throw Errors.invalidArgument('key', "Key was already in table.");
                 }
 
                 entry.Key = key;

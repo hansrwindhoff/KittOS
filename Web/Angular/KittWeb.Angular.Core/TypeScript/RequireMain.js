@@ -1,16 +1,4 @@
-﻿/// <reference path="../Scripts/typings/requirejs/require.d.ts" />
-/// <reference path="../../../TypeScript/KittWeb.TypeScript.Core/Core.ts" />
-var Core;
-(function (Core) {
-    var RequireMain = (function () {
-        function RequireMain() {
-            this.paths = new Core.DictionaryTest();
-        }
-        return RequireMain;
-    })();
-    Core.RequireMain = RequireMain;
-})(Core || (Core = {}));
-require.config({
+﻿require.config({
     baseUrl: '../js',
     paths: {
         'jquery': '../Scripts/jquery/1.11.0/jquery',

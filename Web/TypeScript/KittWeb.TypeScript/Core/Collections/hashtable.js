@@ -19,7 +19,7 @@ var TypeScript;
             function HashTable(capacity, hash) {
                 this.hash = hash;
                 this.count = 0;
-                var size = Hash.getPrime(capacity);
+                var size = TypeScript.Hash.getPrime(capacity);
                 this.entries = TypeScript.ArrayUtilities.createArray(size, null);
             }
             // Maps 'key' to 'value' in this table.  Does not throw if 'key' is already in the table.
@@ -49,7 +49,7 @@ var TypeScript;
                 var hashCode = this.hash === null ? key.hashCode : this.hash(key);
 
                 hashCode = hashCode & 0x7FFFFFFF;
-                Debug.assert(hashCode >= 0);
+                TypeScript.Debug.assert(hashCode >= 0);
 
                 return hashCode;
             };
@@ -61,7 +61,7 @@ var TypeScript;
                 var entry = this.findEntry(key, hashCode);
                 if (entry !== null) {
                     if (throwOnExistingEntry) {
-                        throw TypeScript.Errors.argument('key', "Key was already in table.");
+                        throw TypeScript.Errors.invalidArgument('key', "Key was already in table.");
                     }
 
                     entry.Key = key;
@@ -115,7 +115,7 @@ var TypeScript;
             //}
             HashTable.prototype.grow = function () {
                 //this.dumpStats();
-                var newSize = Hash.expandPrime(this.entries.length);
+                var newSize = TypeScript.Hash.expandPrime(this.entries.length);
 
                 var oldEntries = this.entries;
                 var newEntries = TypeScript.ArrayUtilities.createArray(newSize, null);

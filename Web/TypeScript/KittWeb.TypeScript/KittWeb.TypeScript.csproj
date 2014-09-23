@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Angular\references.ts" />
+    <TypeScriptCompile Include="Core\Utilities\functionInterfaces.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Collections\hashtable.ts" />
     <TypeScriptCompile Include="Core\constants.ts" />

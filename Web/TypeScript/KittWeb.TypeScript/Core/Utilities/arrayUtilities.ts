@@ -2,10 +2,6 @@
 ///<reference path='../references.ts' />
 
 module TypeScript {
-    export interface IContainsFunc<T> {
-        (a: T[], v: T): boolean;
-    }
-
     export class ArrayUtilities {
         public static all<T>(array: T[], func: (v: T) => boolean): boolean {
             for (var i = 0, n = array.length; i < n; i++) {

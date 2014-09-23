@@ -1,9 +1,9 @@
 ﻿/// <reference path="../Scripts/typings/requirejs/require.d.ts" />
 /// <reference path="../../../TypeScript/KittWeb.TypeScript.Core/Core.ts" />
 
-module KittWeb.Angular.Core {
+module Core {
     export class RequireMain {
-        public T: ;
+        public paths = new Core.DictionaryTest<string, string>();
     }
 }
 require.config({

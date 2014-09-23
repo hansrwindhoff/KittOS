@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KittWeb.Angular.Core", "Web
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TypeScript", "TypeScript", "{6E060DA5-1210-4D0B-9135-FA387CDEB1EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KittWeb.TypeScript", "Web\TypeScript\KittWeb.TypeScript\KittWeb.TypeScript.csproj", "{0AA88F18-CE99-466C-84D3-469168B48CBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedDebug|Any CPU = AutomatedDebug|Any CPU
@@ -56,6 +58,12 @@ Global
 		{A7779048-3F4D-40DD-92F9-3948813A01C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7779048-3F4D-40DD-92F9-3948813A01C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7779048-3F4D-40DD-92F9-3948813A01C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.AutomatedDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.AutomatedDebug|Any CPU.Build.0 = Debug|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AA88F18-CE99-466C-84D3-469168B48CBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,5 +76,6 @@ Global
 		{FBA95E72-5EA1-4936-9DED-20A91430EB0E} = {A7ACA3C9-F685-4412-B30B-9BF623D00C34}
 		{A7779048-3F4D-40DD-92F9-3948813A01C7} = {A7ACA3C9-F685-4412-B30B-9BF623D00C34}
 		{6E060DA5-1210-4D0B-9135-FA387CDEB1EF} = {47DA1E99-0BAE-42A4-B07C-F1F919847CF3}
+		{0AA88F18-CE99-466C-84D3-469168B48CBC} = {6E060DA5-1210-4D0B-9135-FA387CDEB1EF}
 	EndGlobalSection
 EndGlobal

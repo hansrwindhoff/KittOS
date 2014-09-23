@@ -1,5 +1,5 @@
-﻿// Partial Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/errors.ts
-///<reference path='references.ts' />
+﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/errors.ts
+///<reference path='../references.ts' />
 
 module TypeScript {
     export class Errors {
@@ -26,14 +26,5 @@ module TypeScript {
         public static invalidOperation(message?: string): Error {
             return new Error("Invalid operation: " + message);
         }        
-    }
-
-    export class JsTypes {
-        public static JsBoolean = "boolean";
-        public static JsFunction = "function";
-        public static JsNumber = "number";
-        public static JsObject = "object";
-        public static JsString = "string";
-        public static JsUndefined = "undefined";
     }
 } 

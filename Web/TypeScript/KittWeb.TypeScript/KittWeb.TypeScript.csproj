@@ -33,15 +33,18 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Angular\references.ts" />
+    <TypeScriptCompile Include="Core\Utilities\functionDefaults.ts" />
     <TypeScriptCompile Include="Core\Utilities\functionInterfaces.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Collections\hashtable.ts" />
-    <TypeScriptCompile Include="Core\constants.ts" />
+    <TypeScriptCompile Include="Core\Utilities\errors.ts" />
     <TypeScriptCompile Include="Core\hash.ts" />
     <TypeScriptCompile Include="Core\indexable.ts" />
     <TypeScriptCompile Include="Core\references.ts" />
     <TypeScriptCompile Include="Core\Utilities\debug.ts" />
     <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
+    <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
+    <TypeScriptCompile Include="Core\Utilities\objectUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
     <TypeScriptCompile Include="Require\references.ts" />
     <TypeScriptCompile Include="Require\_.ts" />

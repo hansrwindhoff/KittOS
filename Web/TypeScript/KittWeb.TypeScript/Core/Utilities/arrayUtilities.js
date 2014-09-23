@@ -43,19 +43,13 @@ var TypeScript;
             return ~low;
         };
         ArrayUtilities.contains = function (array, value, containsFunc) {
-            // Default
-            if (!containsFunc) {
-                for (var i = 0; i < array.length; i++) {
-                    if (array[i] === value) {
-                        return true;
-                    }
-                }
+            var f = TypeScript.ObjectUtilities.isNullOrEmptyFluid;
 
-                return false;
+            if (!f) {
+                return TypeScript.FunctionDefaults.contains(array, value);
             }
 
-            // User Supplied
-            if (typeof (containsFunc) === TypeScript.JsTypes.JsFunction) {
+            if (typeof (f) === TypeScript.JsTypes.JsFunction) {
                 return containsFunc(array, value);
             }
         };

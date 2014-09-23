@@ -43,19 +43,13 @@ module TypeScript {
             return ~low;
         }
         public static contains<T>(array: T[], value: T, containsFunc?: IContainsFunc<T>): boolean {
-            // Default
-            if (!containsFunc) {
-                for (var i = 0; i < array.length; i++) {
-                    if (array[i] === value) {
-                        return true;
-                    }
-                }
+            var f = ObjectUtilities.isNullOrEmptyFluid;
 
-                return false;
+            if (!f) {
+                return FunctionDefaults.contains(array, value);
             }
 
-            // User Supplied
-            if (typeof (containsFunc) === JsTypes.JsFunction) { return containsFunc(array, value); }
+            if (typeof (f) === JsTypes.JsFunction) { return containsFunc(array, value); }
         }
         public static copy<T>(sourceArray: T[], sourceIndex: number, destinationArray: T[], destinationIndex: number, length: number): void {
             for (var i = 0; i < length; i++) {

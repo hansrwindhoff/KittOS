@@ -1,17 +1,11 @@
 ﻿/// <reference path="../Scripts/typings/requirejs/require.d.ts" />
+/// <reference path="../../../TypeScript/KittWeb.TypeScript.Core/Core.ts" />
 
-class RequireMain {
+module KittWeb.Angular.Core {
+    export class RequireMain {
+        public T: ;
+    }
 }
-
-interface AngularConfig<TResult> {
-    keys: 
-}
-
-interface <TResult extends {}>(
-        keys: _.List < string>,
-        values: _.List < any>): TResult;
-);
-
 require.config({
     baseUrl: '../js',
     paths: {

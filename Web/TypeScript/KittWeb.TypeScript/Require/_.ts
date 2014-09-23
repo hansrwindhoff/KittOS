@@ -35,4 +35,4 @@ require(['jquery', 'angular', 'angular-route', 'angular-resource', 'angular-ui-b
         $(function () {
             angular.bootstrap(document, ['application']);
         });
-    });
+    }); 

@@ -1,1 +1,1 @@
-{"version":3,"file":"jsTypes.js","sourceRoot":"","sources":["jsTypes.ts"],"names":[],"mappings":"AAAA,wCAAwC;AAExC,kBAAkB;AAClB,4BAA4B;AAC5B,8CAA8C;AAC9C,gDAAgD;AAChD,4CAA4C;AAC5C,4CAA4C;AAC5C,4CAA4C;AAC5C,kDAAkD;AAClD,OAAO;AACP,GAAG"}
+{"version":3,"file":"jsTypes.js","sourceRoot":"","sources":["jsTypes.ts"],"names":["JsTypes","JsTypes.constructor"],"mappings":"AAAA;IAAA;QAAAA;QAOAC,CAACA;AAAAD,QANGA,oBAA0BA,SAASA;QACnCA,qBAA2BA,UAAUA;QACrCA,mBAAyBA,QAAQA;QACjCA,mBAAyBA,QAAQA;QACjCA,mBAAyBA,QAAQA;QACjCA,sBAA4BA,WAAWA;QAC3CA,eAACA;IAADA,CAACA,IAAA;;;IAED,cAAiB;GAAA"}

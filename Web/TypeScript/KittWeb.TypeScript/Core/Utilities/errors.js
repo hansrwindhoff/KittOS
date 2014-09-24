@@ -1,7 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/errors.ts
-///<reference path='_references.ts' />
-var KittWeb;
-(function (KittWeb) {
+define(["require", "exports"], function(require, exports) {
     var Errors = (function () {
         function Errors() {
         }
@@ -30,6 +28,8 @@ var KittWeb;
         };
         return Errors;
     })();
-    KittWeb.Errors = Errors;
-})(KittWeb || (KittWeb = {}));
+
+    
+    return Errors;
+});
 //# sourceMappingURL=errors.js.map

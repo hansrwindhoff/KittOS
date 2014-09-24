@@ -1,7 +1,6 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/integerUtilities.ts
-///<reference path='_references.ts' />
-var KittWeb;
-(function (KittWeb) {
+define(["require", "exports"], function(require, exports) {
+    var IntegerUtilities;
     (function (IntegerUtilities) {
         function integerDivide(numerator, denominator) {
             return (numerator / denominator) >> 0;
@@ -41,7 +40,9 @@ var KittWeb;
             return /^0(x|X)[0-9a-fA-F]+$/.test(text);
         }
         IntegerUtilities.isHexInteger = isHexInteger;
-    })(KittWeb.IntegerUtilities || (KittWeb.IntegerUtilities = {}));
-    var IntegerUtilities = KittWeb.IntegerUtilities;
-})(KittWeb || (KittWeb = {}));
+    })(IntegerUtilities || (IntegerUtilities = {}));
+
+    
+    return IntegerUtilities;
+});
 //# sourceMappingURL=integerUtilities.js.map

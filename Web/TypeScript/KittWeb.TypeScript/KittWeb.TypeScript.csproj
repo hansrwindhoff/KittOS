@@ -32,21 +32,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Angular\references.ts" />
-    <TypeScriptCompile Include="Core\Collections\_references.ts" />
     <TypeScriptCompile Include="Core\Utilities\funcDef.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
-    <TypeScriptCompile Include="Core\Collections\hashtable.ts" />
     <TypeScriptCompile Include="Core\Utilities\errors.ts" />
     <TypeScriptCompile Include="Core\hash.ts" />
     <TypeScriptCompile Include="Core\indexable.ts" />
-    <TypeScriptCompile Include="Core\_references.ts" />
     <TypeScriptCompile Include="Core\Utilities\debug.ts" />
     <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
-    <TypeScriptCompile Include="Core\Utilities\_references.ts" />
     <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
-    <TypeScriptCompile Include="Require\references.ts" />
     <TypeScriptCompile Include="Require\_.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -59,7 +53,10 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Angular\" />
+    <Folder Include="Core\Collections\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -89,6 +86,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>amd</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>

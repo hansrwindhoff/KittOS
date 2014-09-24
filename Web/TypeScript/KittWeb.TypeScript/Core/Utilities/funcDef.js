@@ -1,6 +1,4 @@
-﻿///<reference path="_references.ts" />
-var KittWeb;
-(function (KittWeb) {
+﻿define(["require", "exports", "jsTypes"], function(require, exports, jsTypes) {
     var FuncDef = (function () {
         function FuncDef() {
         }
@@ -55,7 +53,7 @@ var KittWeb;
 
         // Object Related
         FuncDef.isFunction = function (obj) {
-            return (typeof obj) === JsTypes.JsFunction;
+            return (typeof obj) === jsTypes.JsFunction;
         };
         FuncDef.isFunctionFluid = function (obj) {
             var _this = this;
@@ -82,7 +80,7 @@ var KittWeb;
             }, obj);
         };
         FuncDef.isUndefined = function (obj) {
-            return typeof (obj) === JsTypes.JsUndefined;
+            return typeof (obj) === jsTypes.JsUndefined;
         };
         FuncDef.isUndefinedFluid = function (obj) {
             var _this = this;
@@ -92,6 +90,8 @@ var KittWeb;
         };
         return FuncDef;
     })();
-    KittWeb.FuncDef = FuncDef;
-})(KittWeb || (KittWeb = {}));
+
+    
+    return FuncDef;
+});
 //# sourceMappingURL=funcDef.js.map

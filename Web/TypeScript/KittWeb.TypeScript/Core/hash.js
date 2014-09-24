@@ -1,7 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hash.ts
-///<reference path='_references.ts' />
-var KittWeb;
-(function (KittWeb) {
+define(["require", "exports", "Utilities/errors", "Utilities/IntegerUtilities"], function(require, exports, errors, integerUtilities) {
     var Hash = (function () {
         function Hash() {
         }
@@ -10,7 +8,7 @@ var KittWeb;
             var end = start + len;
 
             for (var i = start; i < end; i++) {
-                hashCode = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(hashCode ^ text[i], Hash.FNV_PRIME);
+                hashCode = integerUtilities.integerMultiplyLow32Bits(hashCode ^ text[i], Hash.FNV_PRIME);
             }
 
             return hashCode;
@@ -74,11 +72,11 @@ var KittWeb;
 
                 var k = Math.abs(c1 | (c2 << 16));
 
-                k = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(k, m);
+                k = integerUtilities.integerMultiplyLow32Bits(k, m);
                 k ^= k >> r;
-                k = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(k, m);
+                k = integerUtilities.integerMultiplyLow32Bits(k, m);
 
-                h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+                h = integerUtilities.integerMultiplyLow32Bits(h, m);
                 h ^= k;
 
                 index += 2;
@@ -89,12 +87,12 @@ var KittWeb;
             // odd length.
             if (numberOfCharsLeft === 1) {
                 h ^= key.charCodeAt(index);
-                h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+                h = integerUtilities.integerMultiplyLow32Bits(h, m);
             }
 
             // Do a few final mixes of the hash to ensure the last few bytes are well-incorporated.
             h ^= h >> 13;
-            h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+            h = integerUtilities.integerMultiplyLow32Bits(h, m);
             h ^= h >> 15;
 
             return h;
@@ -108,7 +106,7 @@ var KittWeb;
                 }
             }
 
-            throw KittWeb.Errors.notYetImplemented();
+            throw errors.notYetImplemented();
         };
 
         Hash.expandPrime = function (oldSize) {
@@ -136,6 +134,8 @@ var KittWeb;
             4166287, 4999559, 5999471, 7199369];
         return Hash;
     })();
-    KittWeb.Hash = Hash;
-})(KittWeb || (KittWeb = {}));
+
+    
+    return Hash;
+});
 //# sourceMappingURL=hash.js.map

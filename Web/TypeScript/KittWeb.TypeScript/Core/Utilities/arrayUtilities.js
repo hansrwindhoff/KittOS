@@ -1,29 +1,29 @@
-﻿///<reference path='_references.ts' />
-var KittWeb;
-(function (KittWeb) {
+﻿define(["require", "exports", "funcDef"], function(require, exports, sdf) {
     var ArrayUtilities = (function () {
         function ArrayUtilities() {
         }
         ArrayUtilities.contains = function (array, value, containsFunc) {
-            if (KittWeb.FuncDef.isNullOrUndefinedFluid(containsFunc)) {
-                return KittWeb.FuncDef.contains(array, value);
+            if (sdf.isNullOrUndefinedFluid(containsFunc)) {
+                return sdf.contains(array, value);
             }
 
-            if (KittWeb.FuncDef.isFunction(containsFunc)) {
+            if (sdf.isFunction(containsFunc)) {
                 return containsFunc(array, value);
             }
         };
         ArrayUtilities.createArray = function (length, defaultValue, createArrayFunc) {
-            if (KittWeb.FuncDef.isNullOrUndefinedFluid(createArrayFunc)) {
-                return KittWeb.FuncDef.createArray(length, defaultValue);
+            if (sdf.isNullOrUndefinedFluid(createArrayFunc)) {
+                return sdf.createArray(length, defaultValue);
             }
 
-            if (KittWeb.FuncDef.isFunction(createArrayFunc)) {
+            if (sdf.isFunction(createArrayFunc)) {
                 return createArrayFunc(length, defaultValue);
             }
         };
         return ArrayUtilities;
     })();
-    KittWeb.ArrayUtilities = ArrayUtilities;
-})(KittWeb || (KittWeb = {}));
+
+    
+    return ArrayUtilities;
+});
 //# sourceMappingURL=arrayUtilities.js.map

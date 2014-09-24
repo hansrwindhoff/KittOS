@@ -1,19 +1,6 @@
 ﻿///<reference path="_references.ts" />
 var KittWeb;
 (function (KittWeb) {
-    var JsTypes = (function () {
-        function JsTypes() {
-        }
-        JsTypes.JsBoolean = "boolean";
-        JsTypes.JsFunction = "function";
-        JsTypes.JsNumber = "number";
-        JsTypes.JsObject = "object";
-        JsTypes.JsString = "string";
-        JsTypes.JsUndefined = "undefined";
-        return JsTypes;
-    })();
-    KittWeb.JsTypes = JsTypes;
-
     var FuncDef = (function () {
         function FuncDef() {
         }

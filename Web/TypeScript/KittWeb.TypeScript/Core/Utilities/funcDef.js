@@ -18,19 +18,19 @@ var KittWeb;
         function FuncDef() {
         }
         // Helpers
-        FuncDef.evalCall = function (predicateFunc, func) {
+        FuncDef.truthyCall = function (predicateFunc, func) {
             if (predicateFunc()) {
                 func();
             }
         };
-        FuncDef.evalFluid = function (predicateFunc, obj) {
+        FuncDef.truthyFluid = function (predicateFunc, obj) {
             if (predicateFunc()) {
                 return obj;
             }
 
             return null;
         };
-        FuncDef.evalMulti = function (predicates) {
+        FuncDef.truthyMulti = function (predicates) {
             var result = predicates[0]();
 
             if (result && predicates.length > 1) {
@@ -44,11 +44,6 @@ var KittWeb;
             }
 
             return result;
-        };
-        FuncDef.evalThrow = function (predicateFunc, errorFunc) {
-            if (!predicateFunc()) {
-                errorFunc();
-            }
         };
 
         // Array Related
@@ -77,7 +72,7 @@ var KittWeb;
         };
         FuncDef.isFunctionFluid = function (obj) {
             var _this = this;
-            return this.evalFluid(function () {
+            return this.truthyFluid(function () {
                 return _this.isFunction(obj);
             }, obj);
         };
@@ -86,7 +81,7 @@ var KittWeb;
         };
         FuncDef.isNullFluid = function (obj) {
             var _this = this;
-            return this.evalFluid(function () {
+            return this.truthyFluid(function () {
                 return _this.isNull(obj);
             }, obj);
         };
@@ -95,7 +90,7 @@ var KittWeb;
         };
         FuncDef.isNullOrUndefinedFluid = function (obj) {
             var _this = this;
-            return this.evalFluid(function () {
+            return this.truthyFluid(function () {
                 return _this.isNullOrUndefined(obj);
             }, obj);
         };
@@ -104,7 +99,7 @@ var KittWeb;
         };
         FuncDef.isUndefinedFluid = function (obj) {
             var _this = this;
-            return this.evalFluid(function () {
+            return this.truthyFluid(function () {
                 return _this.isUndefined(obj);
             }, obj);
         };

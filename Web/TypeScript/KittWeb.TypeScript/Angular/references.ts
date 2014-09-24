@@ -1,1 +1,1 @@
-﻿///<reference path='../Core/references.ts' />  
+﻿///<reference path='../Core/_references.ts' />  

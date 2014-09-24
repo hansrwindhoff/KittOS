@@ -1,5 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hashTable.ts
-///<reference path='../references.ts' />
+///<reference path="_references.ts" />
 
 module KittWeb.Collections {
     export var DefaultHashTableCapacity = 1024;
@@ -22,12 +22,12 @@ module KittWeb.Collections {
             this.entries = ArrayUtilities.createArray<HashTableEntry<TKey, TValue>>(size, null);
         }
 
-        // Maps 'key' to 'value' in this table.  Does not throw if 'key' is already in the table.
+        // Maps "key" to "value" in this table.  Does not throw if "key" is already in the table.
         public set(key: TKey, value: TValue): void {
             this.addOrSet(key, value, /*throwOnExistingEntry:*/ false);
         }
 
-        // Maps 'key' to 'value' in this table.  Throws if 'key' is already in the table.
+        // Maps "key" to "value" in this table.  Throws if "key" is already in the table.
         public add(key: TKey, value: TValue): void {
             this.addOrSet(key, value, /*throwOnExistingEntry:*/ true);
         }
@@ -57,13 +57,13 @@ module KittWeb.Collections {
         }
 
         private addOrSet(key: TKey, value: TValue, throwOnExistingEntry: boolean): TKey {
-            // Compute the hash for this key.  Also ensure that it's non negative.
+            // Compute the hash for this key.  Also ensure that it"s non negative.
             var hashCode = this.computeHashCode(key);
 
             var entry = this.findEntry(key, hashCode);
             if (entry !== null) {
                 if (throwOnExistingEntry) {
-                    throw Errors.invalidArgument('key', "Key was already in table.");
+                    throw Errors.invalidArgument("key", "Key was already in table.");
                 }
 
                 entry.Key = key;

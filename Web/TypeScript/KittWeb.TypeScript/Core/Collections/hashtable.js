@@ -1,5 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hashTable.ts
-///<reference path='../references.ts' />
+///<reference path="_references.ts" />
 var KittWeb;
 (function (KittWeb) {
     (function (Collections) {
@@ -22,12 +22,12 @@ var KittWeb;
                 var size = KittWeb.Hash.getPrime(capacity);
                 this.entries = KittWeb.ArrayUtilities.createArray(size, null);
             }
-            // Maps 'key' to 'value' in this table.  Does not throw if 'key' is already in the table.
+            // Maps "key" to "value" in this table.  Does not throw if "key" is already in the table.
             HashTable.prototype.set = function (key, value) {
                 this.addOrSet(key, value, false);
             };
 
-            // Maps 'key' to 'value' in this table.  Throws if 'key' is already in the table.
+            // Maps "key" to "value" in this table.  Throws if "key" is already in the table.
             HashTable.prototype.add = function (key, value) {
                 this.addOrSet(key, value, true);
             };
@@ -55,13 +55,13 @@ var KittWeb;
             };
 
             HashTable.prototype.addOrSet = function (key, value, throwOnExistingEntry) {
-                // Compute the hash for this key.  Also ensure that it's non negative.
+                // Compute the hash for this key.  Also ensure that it"s non negative.
                 var hashCode = this.computeHashCode(key);
 
                 var entry = this.findEntry(key, hashCode);
                 if (entry !== null) {
                     if (throwOnExistingEntry) {
-                        throw KittWeb.Errors.invalidArgument('key', "Key was already in table.");
+                        throw KittWeb.Errors.invalidArgument("key", "Key was already in table.");
                     }
 
                     entry.Key = key;

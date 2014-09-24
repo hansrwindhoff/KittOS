@@ -1,5 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/integerUtilities.ts
-///<reference path='../references.ts' />
+///<reference path='_references.ts' />
 var KittWeb;
 (function (KittWeb) {
     (function (IntegerUtilities) {

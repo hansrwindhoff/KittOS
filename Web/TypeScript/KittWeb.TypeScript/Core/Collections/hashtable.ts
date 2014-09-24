@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hashTable.ts
 ///<reference path='../references.ts' />
 
-module TypeScript.Collections {
+module KittWeb.Collections {
     export var DefaultHashTableCapacity = 1024;
 
     class HashTableEntry<TEntryKey, TEntryValue> {

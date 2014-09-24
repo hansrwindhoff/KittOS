@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/stringUtilities.ts
 ///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export class StringUtilities {
         public static isString(value: any): boolean {
             return Object.prototype.toString.apply(value, []) === '[object String]';

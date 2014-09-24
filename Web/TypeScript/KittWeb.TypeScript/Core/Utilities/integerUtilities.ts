@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/integerUtilities.ts
 ///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export module IntegerUtilities {
         export function integerDivide(numerator: number, denominator: number): number {
             return (numerator / denominator) >> 0;

@@ -1,14 +1,14 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/debug.ts
 ///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     (function (AssertionLevel) {
         AssertionLevel[AssertionLevel["None"] = 0] = "None";
         AssertionLevel[AssertionLevel["Normal"] = 1] = "Normal";
         AssertionLevel[AssertionLevel["Aggressive"] = 2] = "Aggressive";
         AssertionLevel[AssertionLevel["VeryAggressive"] = 3] = "VeryAggressive";
-    })(TypeScript.AssertionLevel || (TypeScript.AssertionLevel = {}));
-    var AssertionLevel = TypeScript.AssertionLevel;
+    })(KittWeb.AssertionLevel || (KittWeb.AssertionLevel = {}));
+    var AssertionLevel = KittWeb.AssertionLevel;
 
     var Debug = (function () {
         function Debug() {
@@ -36,6 +36,6 @@ var TypeScript;
         Debug.currentAssertionLevel = 0 /* None */;
         return Debug;
     })();
-    TypeScript.Debug = Debug;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.Debug = Debug;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=debug.js.map

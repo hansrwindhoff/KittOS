@@ -1,31 +1,65 @@
 ﻿///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     var FunctionDefaults = (function () {
         function FunctionDefaults() {
         }
-        // arrayUtilities
+        // Array Related
         FunctionDefaults.contains = function (array, value) {
             for (var i = 0; i < array.length; i++) {
                 if (array[i] === value) {
                     return true;
                 }
+
+                return false;
             }
         };
 
-        // functionUtilities
-        FunctionDefaults.isFunction = function (obj) {
-            return (typeof obj) === TypeScript.JsTypes.JsFunction;
+        // Function Related
+        FunctionDefaults.callFunction = function (func, predicateFunc) {
+            if (predicateFunc()) {
+                func();
+            }
         };
-        FunctionDefaults.isNullOrEmpty = function (obj) {
-            if (obj) {
-                return true;
+
+        // Helpers
+        // Object Related
+        FunctionDefaults.isFunction = function (obj, shouldThrow) {
+            if (typeof shouldThrow === "undefined") { shouldThrow = false; }
+            return (typeof obj) === KittWeb.JsTypes.JsFunction;
+        };
+        FunctionDefaults.isFunctionFluid = function (obj) {
+            if (!this.isFunction(obj)) {
+                return obj;
             }
 
-            return false;
+            return null;
         };
-        FunctionDefaults.isNullOrEmptyFluid = function (obj) {
-            if (obj) {
+        FunctionDefaults.isNull = function (obj) {
+            return obj === null;
+        };
+        FunctionDefaults.isNullFluid = function (obj) {
+            if (!this.isNull(obj)) {
+                return obj;
+            }
+
+            return null;
+        };
+        FunctionDefaults.isNullOrUndefined = function (obj) {
+            return this.isNull(obj) || this.isUndefined(obj);
+        };
+        FunctionDefaults.isNullOrUndefinedFluid = function (obj) {
+            if (!this.isNullOrUndefined(obj)) {
+                return obj;
+            }
+
+            return null;
+        };
+        FunctionDefaults.isUndefined = function (obj) {
+            return typeof (obj) === KittWeb.JsTypes.JsUndefined;
+        };
+        FunctionDefaults.isUndefinedFluid = function (obj) {
+            if (!this.isUndefined(obj)) {
                 return obj;
             }
 
@@ -33,6 +67,15 @@ var TypeScript;
         };
         return FunctionDefaults;
     })();
-    TypeScript.FunctionDefaults = FunctionDefaults;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.FunctionDefaults = FunctionDefaults;
+})(KittWeb || (KittWeb = {}));
+
+console.log("Init");
+var f = new KittWeb.FunctionDefaults();
+
+KittWeb.FunctionDefaults.callFunction(function () {
+    console.log("HI");
+}, function () {
+    return 1 === 2;
+});
 //# sourceMappingURL=functionDefaults.js.map

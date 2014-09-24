@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TypeScript", "TypeScript", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KittWeb.TypeScript", "Web\TypeScript\KittWeb.TypeScript\KittWeb.TypeScript.csproj", "{0AA88F18-CE99-466C-84D3-469168B48CBC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!Temp", "!Temp", "{7C502117-3072-4875-A2E0-636125C2DAC4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Temp", "_Temp", "{7C502117-3072-4875-A2E0-636125C2DAC4}"
 	ProjectSection(SolutionItems) = preProject
 		gulpOld1.txt = gulpOld1.txt
 		gulpOld2.txt = gulpOld2.txt

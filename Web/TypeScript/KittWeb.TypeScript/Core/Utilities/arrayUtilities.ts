@@ -1,7 +1,7 @@
 ﻿// Partial Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/arrayUtilities.ts
 ///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export class ArrayUtilities {
         public static all<T>(array: T[], func: (v: T) => boolean): boolean {
             for (var i = 0, n = array.length; i < n; i++) {
@@ -43,7 +43,7 @@ module TypeScript {
             return ~low;
         }
         public static contains<T>(array: T[], value: T, containsFunc?: IContainsFunc<T>): boolean {
-            var f = ObjectUtilities.isNullOrEmptyFluid;
+            var f = ObjectUtilities.isNullOrUndefinedFluid(containsFunc);
 
             if (!f) {
                 return FunctionDefaults.contains(array, value);

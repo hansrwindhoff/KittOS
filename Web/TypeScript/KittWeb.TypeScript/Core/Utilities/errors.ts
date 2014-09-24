@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/errors.ts
 ///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export class Errors {
         public static argumentOutOfRange(argument: string): Error {
             return new Error("Argument out of range: " + argument);
@@ -25,6 +25,6 @@ module TypeScript {
 
         public static invalidOperation(message?: string): Error {
             return new Error("Invalid operation: " + message);
-        }        
+        }    
     }
 } 

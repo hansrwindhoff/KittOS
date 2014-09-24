@@ -1,27 +1,29 @@
 ﻿///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export class ObjectUtilities {
         public static isFunction<T>(obj: T, isFunctionFunc?: IBooleanFunc<T>): boolean {
-            if (!isFunctionFunc) {
+            if (this.isNullOrUndefined) {
                 return FunctionDefaults.isFunction(obj);
             }
 
             return isFunctionFunc(obj);
         }
-        public static isNullOrEmpty<T>(obj: T, isNullOrEmptyFunc?: IBooleanFunc<T>) {
-            if (!isNullOrEmptyFunc) {
-                return FunctionDefaults.isNullOrEmpty(obj);
+        public static isNullOrUndefined<T>(obj: T, isNullOrUndefinedFunc?: IBooleanFunc<T>) {
+            // Check if custom function was provided
+            if (FunctionDefaults.isNullOrUndefined(isNullOrUndefinedFunc)) {
+                return FunctionDefaults.isNullOrUndefined(obj); // Return default implementation
             }
 
-            return isNullOrEmptyFunc(obj);
+            return isNullOrUndefinedFunc(obj); // return custom implementation
         }
-        public static isNullOrEmptyFluid<T>(obj: T, isNullOrEmptyFluidFunc?: IFluidFunc<T>): T {
-            if (!isNullOrEmptyFluidFunc) {
-                return FunctionDefaults.isNullOrEmptyFluid(obj);
+        public static isNullOrUndefinedFluid<T>(obj: T, isNullOrUndefinedFluidFunc?: IFluidFunc<T>): T {
+            // Check if custom function was provided
+            if (FunctionDefaults.isNullOrUndefined(isNullOrUndefinedFluidFunc)) {
+                return FunctionDefaults.isNullOrUndefinedFluid(obj); // Return default implementation
             }
 
-            return isNullOrEmptyFluidFunc(obj);
+            return isNullOrUndefinedFluidFunc(obj); // return custom implementation
         }
     }
 } 

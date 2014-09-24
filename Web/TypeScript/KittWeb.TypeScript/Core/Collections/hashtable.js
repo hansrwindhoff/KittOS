@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hashTable.ts
 ///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     (function (Collections) {
         Collections.DefaultHashTableCapacity = 1024;
 
@@ -19,8 +19,8 @@ var TypeScript;
             function HashTable(capacity, hash) {
                 this.hash = hash;
                 this.count = 0;
-                var size = TypeScript.Hash.getPrime(capacity);
-                this.entries = TypeScript.ArrayUtilities.createArray(size, null);
+                var size = KittWeb.Hash.getPrime(capacity);
+                this.entries = KittWeb.ArrayUtilities.createArray(size, null);
             }
             // Maps 'key' to 'value' in this table.  Does not throw if 'key' is already in the table.
             HashTable.prototype.set = function (key, value) {
@@ -49,7 +49,7 @@ var TypeScript;
                 var hashCode = this.hash === null ? key.hashCode : this.hash(key);
 
                 hashCode = hashCode & 0x7FFFFFFF;
-                TypeScript.Debug.assert(hashCode >= 0);
+                KittWeb.Debug.assert(hashCode >= 0);
 
                 return hashCode;
             };
@@ -61,7 +61,7 @@ var TypeScript;
                 var entry = this.findEntry(key, hashCode);
                 if (entry !== null) {
                     if (throwOnExistingEntry) {
-                        throw TypeScript.Errors.invalidArgument('key', "Key was already in table.");
+                        throw KittWeb.Errors.invalidArgument('key', "Key was already in table.");
                     }
 
                     entry.Key = key;
@@ -115,10 +115,10 @@ var TypeScript;
             //}
             HashTable.prototype.grow = function () {
                 //this.dumpStats();
-                var newSize = TypeScript.Hash.expandPrime(this.entries.length);
+                var newSize = KittWeb.Hash.expandPrime(this.entries.length);
 
                 var oldEntries = this.entries;
-                var newEntries = TypeScript.ArrayUtilities.createArray(newSize, null);
+                var newEntries = KittWeb.ArrayUtilities.createArray(newSize, null);
 
                 this.entries = newEntries;
 
@@ -156,7 +156,7 @@ var TypeScript;
             return value.__hash;
         }
         Collections.identityHashCode = identityHashCode;
-    })(TypeScript.Collections || (TypeScript.Collections = {}));
-    var Collections = TypeScript.Collections;
-})(TypeScript || (TypeScript = {}));
+    })(KittWeb.Collections || (KittWeb.Collections = {}));
+    var Collections = KittWeb.Collections;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=hashtable.js.map

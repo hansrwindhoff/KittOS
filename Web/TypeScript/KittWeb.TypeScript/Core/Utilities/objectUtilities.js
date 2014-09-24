@@ -1,32 +1,34 @@
 ﻿///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     var ObjectUtilities = (function () {
         function ObjectUtilities() {
         }
         ObjectUtilities.isFunction = function (obj, isFunctionFunc) {
-            if (!isFunctionFunc) {
-                return TypeScript.FunctionDefaults.isFunction(obj);
+            if (this.isNullOrUndefined) {
+                return KittWeb.FunctionDefaults.isFunction(obj);
             }
 
             return isFunctionFunc(obj);
         };
-        ObjectUtilities.isNullOrEmpty = function (obj, isNullOrEmptyFunc) {
-            if (!isNullOrEmptyFunc) {
-                return TypeScript.FunctionDefaults.isNullOrEmpty(obj);
+        ObjectUtilities.isNullOrUndefined = function (obj, isNullOrUndefinedFunc) {
+            // Check if custom function was provided
+            if (KittWeb.FunctionDefaults.isNullOrUndefined(isNullOrUndefinedFunc)) {
+                return KittWeb.FunctionDefaults.isNullOrUndefined(obj);
             }
 
-            return isNullOrEmptyFunc(obj);
+            return isNullOrUndefinedFunc(obj);
         };
-        ObjectUtilities.isNullOrEmptyFluid = function (obj, isNullOrEmptyFluidFunc) {
-            if (!isNullOrEmptyFluidFunc) {
-                return TypeScript.FunctionDefaults.isNullOrEmptyFluid(obj);
+        ObjectUtilities.isNullOrUndefinedFluid = function (obj, isNullOrUndefinedFluidFunc) {
+            // Check if custom function was provided
+            if (KittWeb.FunctionDefaults.isNullOrUndefined(isNullOrUndefinedFluidFunc)) {
+                return KittWeb.FunctionDefaults.isNullOrUndefinedFluid(obj);
             }
 
-            return isNullOrEmptyFluidFunc(obj);
+            return isNullOrUndefinedFluidFunc(obj);
         };
         return ObjectUtilities;
     })();
-    TypeScript.ObjectUtilities = ObjectUtilities;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.ObjectUtilities = ObjectUtilities;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=objectUtilities.js.map

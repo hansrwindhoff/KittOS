@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hash.ts
 ///<reference path='references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     var Hash = (function () {
         function Hash() {
         }
@@ -10,7 +10,7 @@ var TypeScript;
             var end = start + len;
 
             for (var i = start; i < end; i++) {
-                hashCode = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(hashCode ^ text[i], Hash.FNV_PRIME);
+                hashCode = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(hashCode ^ text[i], Hash.FNV_PRIME);
             }
 
             return hashCode;
@@ -74,11 +74,11 @@ var TypeScript;
 
                 var k = Math.abs(c1 | (c2 << 16));
 
-                k = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(k, m);
+                k = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(k, m);
                 k ^= k >> r;
-                k = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(k, m);
+                k = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(k, m);
 
-                h = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+                h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
                 h ^= k;
 
                 index += 2;
@@ -89,12 +89,12 @@ var TypeScript;
             // odd length.
             if (numberOfCharsLeft === 1) {
                 h ^= key.charCodeAt(index);
-                h = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+                h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
             }
 
             // Do a few final mixes of the hash to ensure the last few bytes are well-incorporated.
             h ^= h >> 13;
-            h = TypeScript.IntegerUtilities.integerMultiplyLow32Bits(h, m);
+            h = KittWeb.IntegerUtilities.integerMultiplyLow32Bits(h, m);
             h ^= h >> 15;
 
             return h;
@@ -108,7 +108,7 @@ var TypeScript;
                 }
             }
 
-            throw TypeScript.Errors.notYetImplemented();
+            throw KittWeb.Errors.notYetImplemented();
         };
 
         Hash.expandPrime = function (oldSize) {
@@ -136,6 +136,6 @@ var TypeScript;
             4166287, 4999559, 5999471, 7199369];
         return Hash;
     })();
-    TypeScript.Hash = Hash;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.Hash = Hash;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=hash.js.map

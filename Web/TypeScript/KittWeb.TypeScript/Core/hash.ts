@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hash.ts
 ///<reference path='references.ts' />
 
-module TypeScript {
+module KittWeb {
     export class Hash {
         // This table uses FNV1a as a string hash
         private static FNV_BASE = 2166136261;

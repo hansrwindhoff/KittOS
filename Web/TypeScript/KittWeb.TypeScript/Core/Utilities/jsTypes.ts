@@ -1,4 +1,4 @@
-﻿module TypeScript {
+﻿module KittWeb {
     export class JsTypes {
         public static JsBoolean = "boolean";
         public static JsFunction = "function";

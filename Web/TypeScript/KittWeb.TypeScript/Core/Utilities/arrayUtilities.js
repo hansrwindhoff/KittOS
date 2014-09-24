@@ -1,7 +1,7 @@
 ﻿// Partial Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/arrayUtilities.ts
 ///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     var ArrayUtilities = (function () {
         function ArrayUtilities() {
         }
@@ -43,13 +43,13 @@ var TypeScript;
             return ~low;
         };
         ArrayUtilities.contains = function (array, value, containsFunc) {
-            var f = TypeScript.ObjectUtilities.isNullOrEmptyFluid;
+            var f = KittWeb.ObjectUtilities.isNullOrUndefinedFluid(containsFunc);
 
             if (!f) {
-                return TypeScript.FunctionDefaults.contains(array, value);
+                return KittWeb.FunctionDefaults.contains(array, value);
             }
 
-            if (typeof (f) === TypeScript.JsTypes.JsFunction) {
+            if (typeof (f) === KittWeb.JsTypes.JsFunction) {
                 return containsFunc(array, value);
             }
         };
@@ -94,7 +94,7 @@ var TypeScript;
                 }
             }
 
-            throw TypeScript.Errors.invalidOperation();
+            throw KittWeb.Errors.invalidOperation();
         };
         ArrayUtilities.firstOrDefault = function (array, func) {
             for (var i = 0, n = array.length; i < n; i++) {
@@ -140,7 +140,7 @@ var TypeScript;
         };
         ArrayUtilities.last = function (array) {
             if (array.length === 0) {
-                throw TypeScript.Errors.argumentOutOfRange('array');
+                throw KittWeb.Errors.argumentOutOfRange('array');
             }
 
             return array[array.length - 1];
@@ -233,6 +233,6 @@ var TypeScript;
         };
         return ArrayUtilities;
     })();
-    TypeScript.ArrayUtilities = ArrayUtilities;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.ArrayUtilities = ArrayUtilities;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=arrayUtilities.js.map

@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/stringUtilities.ts
 ///<reference path='../references.ts' />
-var TypeScript;
-(function (TypeScript) {
+var KittWeb;
+(function (KittWeb) {
     var StringUtilities = (function () {
         function StringUtilities() {
         }
@@ -36,6 +36,6 @@ var TypeScript;
         };
         return StringUtilities;
     })();
-    TypeScript.StringUtilities = StringUtilities;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.StringUtilities = StringUtilities;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=stringUtilities.js.map

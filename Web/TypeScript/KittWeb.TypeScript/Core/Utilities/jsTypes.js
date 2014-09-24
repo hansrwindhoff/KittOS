@@ -1,5 +1,5 @@
-﻿var TypeScript;
-(function (TypeScript) {
+﻿var KittWeb;
+(function (KittWeb) {
     var JsTypes = (function () {
         function JsTypes() {
         }
@@ -11,6 +11,6 @@
         JsTypes.JsUndefined = "undefined";
         return JsTypes;
     })();
-    TypeScript.JsTypes = JsTypes;
-})(TypeScript || (TypeScript = {}));
+    KittWeb.JsTypes = JsTypes;
+})(KittWeb || (KittWeb = {}));
 //# sourceMappingURL=jsTypes.js.map

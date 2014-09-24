@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/debug.ts
 ///<reference path='../references.ts' />
 
-module TypeScript {
+module KittWeb {
     export enum AssertionLevel {
         None = 0,
         Normal = 1,

@@ -42,6 +42,7 @@
     <TypeScriptCompile Include="Core\indexable.ts" />
     <TypeScriptCompile Include="Core\references.ts" />
     <TypeScriptCompile Include="Core\Utilities\debug.ts" />
+    <TypeScriptCompile Include="Core\Utilities\functionUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
     <TypeScriptCompile Include="Core\Utilities\objectUtilities.ts" />

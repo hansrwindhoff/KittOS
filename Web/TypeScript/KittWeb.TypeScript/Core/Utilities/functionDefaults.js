@@ -5,17 +5,17 @@ var KittWeb;
         function FunctionDefaults() {
         }
         // Helpers
-        FunctionDefaults.evaluateFluid = function (obj, predicateFunc) {
+        FunctionDefaults.evalCallFunc = function (func, predicateFunc) {
+            if (predicateFunc()) {
+                func();
+            }
+        };
+        FunctionDefaults.evalFluid = function (obj, predicateFunc) {
             if (predicateFunc()) {
                 return obj;
             }
 
             return null;
-        };
-        FunctionDefaults.callFunction = function (func, predicateFunc) {
-            if (predicateFunc()) {
-                func();
-            }
         };
 
         // Array Related
@@ -35,7 +35,7 @@ var KittWeb;
         };
         FunctionDefaults.isFunctionFluid = function (obj) {
             var _this = this;
-            return this.evaluateFluid(obj, function () {
+            return this.evalFluid(obj, function () {
                 return _this.isFunction(obj);
             });
         };
@@ -44,7 +44,7 @@ var KittWeb;
         };
         FunctionDefaults.isNullFluid = function (obj) {
             var _this = this;
-            return this.evaluateFluid(obj, function () {
+            return this.evalFluid(obj, function () {
                 return _this.isNull(obj);
             });
         };
@@ -53,7 +53,7 @@ var KittWeb;
         };
         FunctionDefaults.isNullOrUndefinedFluid = function (obj) {
             var _this = this;
-            return this.evaluateFluid(obj, function () {
+            return this.evalFluid(obj, function () {
                 return _this.isNullOrUndefined(obj);
             });
         };
@@ -62,7 +62,7 @@ var KittWeb;
         };
         FunctionDefaults.isUndefinedFluid = function (obj) {
             var _this = this;
-            return this.evaluateFluid(obj, function () {
+            return this.evalFluid(obj, function () {
                 return _this.isUndefined(obj);
             });
         };

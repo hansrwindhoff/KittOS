@@ -2,6 +2,20 @@
 
 module KittWeb {
     export class FunctionDefaults {
+        // Helpers
+        public static evaluateFluid<T>(obj: T, predicateFunc: IBooleanFuncAny): T {
+            if (predicateFunc()) {
+                return obj; // return obj if predicate evaluates to true
+            }
+
+            return null; // return null if predicate evaluates to false
+        }
+        public static callFunction(func: IFuncAny, predicateFunc?: IBooleanFuncAny) {
+            if (predicateFunc()) { // function only executes if predicate evaluates to true
+                func();
+            }
+        }
+
         // Array Related
         public static contains<T>(array: T[], value: T): boolean {
             for (var i = 0; i < array.length; i++) {
@@ -13,62 +27,30 @@ module KittWeb {
             }
         }
 
-        // Function Related
-        public static callFunction(func: IFuncAny, predicateFunc?: IBooleanFuncAny) {
-            if (predicateFunc()) {
-                func();
-            }
-        }
-
-        // Helpers
-        public static Test1 {
-        }
-
         // Object Related
-        public static isFunction<T>(obj: T, shouldThrow: boolean = false): boolean {
+        public static isFunction(obj: any): boolean {
             return (typeof obj) === JsTypes.JsFunction; // return true if obj is a function
         }
         public static isFunctionFluid<T>(obj: T): T {
-            if (!this.isFunction(obj)) {
-                return obj; // return T if obj is a function
-            }
-
-            return null; // return null if obj not a function
+            return this.evaluateFluid(obj, () => { return this.isFunction(obj); });
         }
-        public static isNull<T>(obj: T): boolean {
+        public static isNull(obj: any): boolean {
             return obj === null; // return true if obj is null
         }
         public static isNullFluid<T>(obj: T): T {
-            if (!this.isNull(obj)) {
-                return obj; // return T if obj is not null
-            }
-
-            return null; // return null if obj is null
+            return this.evaluateFluid(obj, () => { return this.isNull(obj); });
         }
-        public static isNullOrUndefined<T>(obj: T): boolean {
+        public static isNullOrUndefined(obj: any): boolean {
             return this.isNull(obj) || this.isUndefined(obj); // return true if obj is not null or undefined
         }
         public static isNullOrUndefinedFluid<T>(obj: T): T {
-            if (!this.isNullOrUndefined(obj)) {
-                return obj; // return T is obj is not null or undefined
-            }
-
-            return null; // return null if obj is not null or undefined
+            return this.evaluateFluid(obj, () => { return this.isNullOrUndefined(obj); });
         }
-        public static isUndefined<T>(obj: T): boolean {
+        public static isUndefined(obj: any): boolean {
             return typeof (obj) === JsTypes.JsUndefined; // return true if obj is undefined
         }
         public static isUndefinedFluid<T>(obj: T): T {
-            if (!this.isUndefined(obj)) {
-                return obj; // return T if obj is defined
-            }
-
-            return null; // return null if obj is undefined
+            return this.evaluateFluid(obj, () => { return this.isUndefined(obj); });
         }        
     }
 }
-
-console.log("Init");
-var f = new KittWeb.FunctionDefaults();
-
-KittWeb.FunctionDefaults.callFunction(() => { console.log("HI"); }, () => { return 1 === 2; });

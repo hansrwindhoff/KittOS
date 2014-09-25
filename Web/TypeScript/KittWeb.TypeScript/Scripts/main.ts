@@ -1,3 +1,2 @@
-﻿/// <reference path="../RequireJs/RequireMain.ts" />
-
-new KittWeb.RequireMain(() => { console.log("Init"); });
+﻿/// <reference path="../RequireJs/requireJsMain.ts" />
+KittWeb.RequireJs.init().start();

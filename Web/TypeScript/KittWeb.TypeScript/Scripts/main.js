@@ -1,5 +1,3 @@
-﻿/// <reference path="../RequireJs/RequireMain.ts" />
-new KittWeb.RequireMain(function () {
-    console.log("Init");
-});
+﻿/// <reference path="../RequireJs/requireJsMain.ts" />
+KittWeb.RequireJs.init().start();
 //# sourceMappingURL=main.js.map

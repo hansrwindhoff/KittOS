@@ -43,7 +43,7 @@
     <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
     <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
-    <TypeScriptCompile Include="RequireJs\requireMain.ts" />
+    <TypeScriptCompile Include="RequireJs\requireJsMain.ts" />
     <TypeScriptCompile Include="Scripts\main.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />

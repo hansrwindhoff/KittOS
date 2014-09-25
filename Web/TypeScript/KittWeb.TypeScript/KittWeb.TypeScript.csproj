@@ -20,6 +20,8 @@
   <ItemGroup>
     <Content Include="index.html" />
     <Content Include="ms-ts-license.txt" />
+    <Content Include="Scripts\r.js" />
+    <Content Include="Scripts\require.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -41,7 +43,8 @@
     <TypeScriptCompile Include="Core\Utilities\integerUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
     <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
-    <TypeScriptCompile Include="Require\_.ts" />
+    <TypeScriptCompile Include="RequireJs\requireMain.ts" />
+    <TypeScriptCompile Include="Scripts\main.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
@@ -54,7 +57,7 @@
     <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Angular\" />
+    <Folder Include="AngularJs\" />
     <Folder Include="Core\Collections\" />
   </ItemGroup>
   <PropertyGroup>

@@ -1,7 +1,7 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hash.ts
 
 import errors = require("Utilities/errors");
-import integerUtilities = require("Utilities/IntegerUtilities");
+import integerUtilities = require("Utilities/integerUtilities");
 
 class Hash {
     // This table uses FNV1a as a string hash

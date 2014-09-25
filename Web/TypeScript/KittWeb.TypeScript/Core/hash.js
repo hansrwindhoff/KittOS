@@ -1,5 +1,5 @@
 ﻿// Source: https://typescript.codeplex.com/SourceControl/latest#src/compiler/core/hash.ts
-define(["require", "exports", "Utilities/errors", "Utilities/IntegerUtilities"], function(require, exports, errors, integerUtilities) {
+define(["require", "exports", "Utilities/errors", "Utilities/integerUtilities"], function(require, exports, errors, integerUtilities) {
     var Hash = (function () {
         function Hash() {
         }

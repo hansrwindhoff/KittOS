@@ -3,7 +3,7 @@
 module KittWeb.RequireJs {
     export class Manager {
         private static m_config: RequireConfig = { baseUrl: Manager.getDefaultBaseUrl, paths: Manager.getDefaultPaths }
-        private static m_modules: string[];
+        private static m_modules: string[] = Manager.getDefaultModules;
 
         static get getDefaultBaseUrl(): string { return "../"; }
         static get getDefaultModules(): string[] {
@@ -17,19 +17,14 @@ module KittWeb.RequireJs {
                 "funcDef": "Core/Utilities/funcDef"
             };
         }
+        
+        public static getConfig(): RequireConfig { return Manager.m_config; }
+        public static setConfig(value: RequireConfig) { Manager.m_config = value; }
 
-        get getConfig(): RequireConfig { return Manager.m_config; }
-        set setConfig(value: RequireConfig) { Manager.m_config = value; }
-
-        public load(): Manager {
+        public static load() {
+            require.config(Manager.m_config);
             require(Manager.m_modules);
-
-            return this;
-        }
-
-        constructor(config?: RequireConfig, modules?: string[]) {
-            if (config) { Manager.m_config = config; }
-            if (modules) { Manager.m_modules = modules; }
         }
     }
 }
+new KittWeb.RequireJs.Manager();

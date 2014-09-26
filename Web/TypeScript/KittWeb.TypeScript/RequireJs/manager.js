@@ -1,5 +1,4 @@
-﻿/// <reference path="../AngularJs/loader.ts" />
-importScripts("../Scripts/require.js");
+﻿importScripts("../Scripts/require.js");
 
 var KittWeb;
 (function (KittWeb) {

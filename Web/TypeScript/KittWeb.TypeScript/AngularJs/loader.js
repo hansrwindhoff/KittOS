@@ -68,8 +68,4 @@
     })(KittWeb.AngularJs || (KittWeb.AngularJs = {}));
     var AngularJs = KittWeb.AngularJs;
 })(KittWeb || (KittWeb = {}));
-
-(function () {
-    return KittWeb.AngularJs.Loader.getConfig;
-})();
 //# sourceMappingURL=loader.js.map

@@ -24,5 +24,3 @@
         constructor() { throw new Error("Cannot create new instance: KittWeb.AngularJs.Loader is static."); }        
     }
 }
-
-(() => { return KittWeb.AngularJs.Loader.getConfig; })();

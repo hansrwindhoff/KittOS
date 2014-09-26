@@ -4,52 +4,71 @@ var KittWeb;
     (function (RequireJs) {
         var Manager = (function () {
             function Manager() {
+                throw new Error("Cannot create new instance: KittWeb.RequireJs.Manager is static.");
             }
-            Object.defineProperty(Manager, "getDefaultBaseUrl", {
+            Object.defineProperty(Manager, "getConfig", {
                 get: function () {
-                    return "../";
+                    return Manager.m_config;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(Manager, "getDefaultModules", {
-                get: function () {
-                    return [
-                        "funcDef"
-                    ];
+            Object.defineProperty(Manager, "setConfig", {
+                set: function (value) {
+                    Manager.m_config = value;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(Manager, "getDefaultPaths", {
+            Object.defineProperty(Manager, "getModules", {
                 get: function () {
-                    return {
-                        "jsTypes": "Core/Utilities/jsTypes",
-                        "funcDef": "Core/Utilities/funcDef"
+                    return Manager.m_modules;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Manager, "setModules", {
+                set: function (value) {
+                    Manager.m_modules = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Manager, "getPaths", {
+                get: function () {
+                    return Manager.m_paths;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Manager, "setPaths", {
+                set: function (value) {
+                    Manager.m_paths = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Manager.bootstrap = function (url, initFunc) {
+                var w = new Worker(url);
+
+                if (!initFunc) {
+                    w.onmessage = function (msg) {
+                        Manager.setConfig = msg.data.config;
+                        Manager.setModules = msg.data.modules;
+                        require.config(Manager.getConfig);
+                        require(Manager.m_modules);
                     };
-                },
-                enumerable: true,
-                configurable: true
-            });
+                } else {
+                    w.onmessage = initFunc;
+                }
 
-            Manager.getConfig = function () {
-                return Manager.m_config;
+                w.postMessage("init"); // send init message
             };
-            Manager.setConfig = function (value) {
-                Manager.m_config = value;
-            };
-
-            Manager.load = function () {
-                require.config(Manager.m_config);
-                require(Manager.m_modules);
-            };
-            Manager.m_config = { baseUrl: Manager.getDefaultBaseUrl, paths: Manager.getDefaultPaths };
-            Manager.m_modules = Manager.getDefaultModules;
             return Manager;
         })();
         RequireJs.Manager = Manager;
     })(KittWeb.RequireJs || (KittWeb.RequireJs = {}));
     var RequireJs = KittWeb.RequireJs;
 })(KittWeb || (KittWeb = {}));
-new KittWeb.RequireJs.Manager();
 //# sourceMappingURL=manager.js.map

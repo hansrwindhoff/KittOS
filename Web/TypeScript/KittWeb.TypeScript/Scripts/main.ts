@@ -1,2 +1,1 @@
-﻿/// <reference path="../RequireJs/manager.ts" />
-KittWeb.RequireJs.Manager.load();
+﻿KittWeb.RequireJs.Manager.bootstrap("AngularJs/loader.js"); 

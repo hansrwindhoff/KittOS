@@ -2,12 +2,12 @@
 
 class FuncDef {
     // Helpers
-    public static truthyCall(predicateFunc: Function, func: Function) {
+    public static truthyCall(predicateFunc: () => boolean, func: () => boolean) {
         if (predicateFunc()) { // function only executes if predicate evaluates to true
             func();
         }
     }
-    public static truthyFluid<T>(predicateFunc: Function, obj: T): T {
+    public static truthyFluid<T>(predicateFunc: () => boolean, obj: T): T {
         if (predicateFunc()) {
             return obj; // return obj if predicate evaluates to true
         }

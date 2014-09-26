@@ -1,4 +1,6 @@
-﻿/// <reference path="../Scripts/typings/requirejs/require.d.ts" />
+﻿/// <reference path="../AngularJs/loader.ts" />
+importScripts("../Scripts/require.js");
+
 var KittWeb;
 (function (KittWeb) {
     (function (RequireJs) {
@@ -34,41 +36,27 @@ var KittWeb;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(Manager, "getPaths", {
-                get: function () {
-                    return Manager.m_paths;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Manager, "setPaths", {
-                set: function (value) {
-                    Manager.m_paths = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Manager.bootstrap = function (url, initFunc) {
-                var w = new Worker(url);
-
-                if (!initFunc) {
-                    w.onmessage = function (msg) {
-                        Manager.setConfig = msg.data.config;
-                        Manager.setModules = msg.data.modules;
-                        require.config(Manager.getConfig);
-                        require(Manager.m_modules);
-                    };
-                } else {
-                    w.onmessage = initFunc;
-                }
-
-                w.postMessage("init"); // send init message
-            };
             return Manager;
         })();
-        RequireJs.Manager = Manager;
+
+        // Default configuration
+        Manager.setConfig = { baseUrl: "../" };
+        Manager.setModules = [];
     })(KittWeb.RequireJs || (KittWeb.RequireJs = {}));
     var RequireJs = KittWeb.RequireJs;
 })(KittWeb || (KittWeb = {}));
+
+self.addEventListener("message", function (msg) {
+    console.log(msg.data);
+
+    if (msg.data.msgType == "init") {
+        postMessage({ msgType: "initResponse", msgContents: "RequireJs initialized." }, null);
+    }
+    if (msg.data.msgType == "load") {
+        var result = importScripts(msg.data.path);
+        console.log(result);
+
+        postMessage({ msgType: "loadResponse", msgContents: console.log(msg.data.path) }, null);
+    }
+});
 //# sourceMappingURL=manager.js.map

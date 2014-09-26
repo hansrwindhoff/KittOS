@@ -1,1 +1,0 @@
-﻿KittWeb.RequireJs.Manager.bootstrap("AngularJs/loader.js"); 

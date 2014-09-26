@@ -1,5 +1,4 @@
-﻿/// <reference path="../RequireJs/manager.ts" />
-var KittWeb;
+﻿var KittWeb;
 (function (KittWeb) {
     (function (AngularJs) {
         var Loader = (function () {
@@ -61,23 +60,8 @@ var KittWeb;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(Loader, "getPaths", {
-                get: function () {
-                    return Loader.m_paths;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Loader, "setPaths", {
-                set: function (value) {
-                    Loader.m_paths = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Loader.m_config = { baseUrl: Loader.getDefaultBaseUrl, paths: Loader.getDefaultPaths };
             Loader.m_modules = Loader.getDefaultModules;
-            Loader.m_paths = Loader.getDefaultPaths;
             return Loader;
         })();
         AngularJs.Loader = Loader;
@@ -85,9 +69,7 @@ var KittWeb;
     var AngularJs = KittWeb.AngularJs;
 })(KittWeb || (KittWeb = {}));
 
-self.addEventListener("message", function (msg) {
-    if (msg.data == "init") {
-        postMessage({ config: KittWeb.AngularJs.Loader.getConfig, modules: KittWeb.AngularJs.Loader.getModules }, null);
-    }
-});
+(function () {
+    return KittWeb.AngularJs.Loader.getConfig;
+})();
 //# sourceMappingURL=loader.js.map

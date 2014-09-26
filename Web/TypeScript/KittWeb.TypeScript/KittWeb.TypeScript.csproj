@@ -805,7 +805,7 @@
     <TypeScriptCompile Include="Core\Utilities\jsTypes.ts" />
     <TypeScriptCompile Include="Core\Utilities\stringUtilities.ts" />
     <TypeScriptCompile Include="RequireJs\manager.ts" />
-    <TypeScriptCompile Include="Scripts\main.ts" />
+    <TypeScriptCompile Include="RequireJs\dispatcher.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />

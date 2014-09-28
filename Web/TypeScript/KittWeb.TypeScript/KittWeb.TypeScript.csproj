@@ -795,6 +795,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="AngularJs\loader.ts" />
+    <TypeScriptCompile Include="AngularJs\main.ts" />
     <TypeScriptCompile Include="Core\Utilities\funcDef.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\errors.ts" />

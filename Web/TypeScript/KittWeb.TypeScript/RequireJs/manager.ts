@@ -20,12 +20,12 @@ self.addEventListener("message", (msg) => {
     var result = msg.data;
 
     if (result.msgType === "init") {
-        self.postMessage({ msgType: "managerReponse", msgContents: "KittWeb.RequireJs.Manager initialized." }, null);
+        self.postMessage({ msgType: "initSuccess", msgContents: "KittWeb.RequireJs.Manager initialized." }, null);
     }
 
     if (result.msgType === "importConfig") {
         importScripts(msg.data.msgContents);
 
-        self.postMessage({ msgType: "managerResponse", msgContents: msg.data.msgContents + " imported.", test: KittWeb.RequireJs.Manager.getConfig }, null);
+        self.postMessage({ msgType: "importConfigSucces", msgContents: msg.data.msgContents + " imported.", config: KittWeb.RequireJs.Manager.getConfig, modules: KittWeb.RequireJs.Manager.getModules }, null);
     }
 });

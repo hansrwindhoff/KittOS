@@ -6,17 +6,10 @@ var KittWeb;
             function Loader() {
                 throw new Error("Cannot create new instance: KittWeb.AngularJs.Loader is static.");
             }
-            Object.defineProperty(Loader, "getDefaultBaseUrl", {
-                get: function () {
-                    return "../";
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(Loader, "getDefaultModules", {
                 get: function () {
                     return [
-                        "funcDef"
+                        "main"
                     ];
                 },
                 enumerable: true,
@@ -25,8 +18,8 @@ var KittWeb;
             Object.defineProperty(Loader, "getDefaultPaths", {
                 get: function () {
                     return {
-                        "jsTypes": "Core/Utilities/jsTypes",
-                        "funcDef": "Core/Utilities/funcDef"
+                        "jsTypes": "../Core/Utilities/jsTypes",
+                        "main": "../AngularJs/main"
                     };
                 },
                 enumerable: true,
@@ -61,7 +54,7 @@ var KittWeb;
                 enumerable: true,
                 configurable: true
             });
-            Loader.m_config = { baseUrl: Loader.getDefaultBaseUrl, paths: Loader.getDefaultPaths };
+            Loader.m_config = { paths: Loader.getDefaultPaths };
             Loader.m_modules = Loader.getDefaultModules;
             return Loader;
         })();

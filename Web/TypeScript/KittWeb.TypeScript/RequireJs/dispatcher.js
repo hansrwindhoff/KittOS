@@ -1,4 +1,5 @@
-﻿var KittWeb;
+﻿/// <reference path="../Core/Utilities/funcDef.ts" />
+var KittWeb;
 (function (KittWeb) {
     (function (RequireJs) {
         var Dispatcher = (function () {
@@ -15,6 +16,11 @@
                     console.log("***KittWeb.RequireJs.Manager: message recieved!***");
                     console.log("Type: " + msg.data.msgType);
                     console.log("Contents: " + msg.data.msgContents);
+
+                    if (msg.data.msgType === "importConfigSucces") {
+                        require.config(msg.data.config);
+                        require(msg.data.modules);
+                    }
                 });
 
                 w.postMessage({ msgType: "init" });

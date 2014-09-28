@@ -1,4 +1,6 @@
-﻿module KittWeb.RequireJs {
+﻿/// <reference path="../Core/Utilities/funcDef.ts" />
+
+module KittWeb.RequireJs {
     class Dispatcher {
         private static m_worker: Worker = (() => {
             var w = new Worker("RequireJs/manager.js");
@@ -7,6 +9,11 @@
                 console.log("***KittWeb.RequireJs.Manager: message recieved!***");
                 console.log("Type: " + msg.data.msgType);
                 console.log("Contents: " + msg.data.msgContents);
+
+                if (msg.data.msgType === "importConfigSucces") {
+                    require.config(msg.data.config);
+                    require(msg.data.modules);
+                }
             });
 
             w.postMessage({ msgType: "init" });

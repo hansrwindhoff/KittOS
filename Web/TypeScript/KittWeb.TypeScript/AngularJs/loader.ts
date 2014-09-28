@@ -2,19 +2,18 @@
 
 module KittWeb.AngularJs {
     export class Loader {
-        private static m_config: RequireConfig = { baseUrl: Loader.getDefaultBaseUrl, paths: Loader.getDefaultPaths }
+        private static m_config: RequireConfig = { paths: Loader.getDefaultPaths }
         private static m_modules: string[] = Loader.getDefaultModules;
 
-        static get getDefaultBaseUrl(): string { return "../"; }
         static get getDefaultModules(): string[] {
             return [
-                "funcDef"
+                "main"
             ];
         }
         static get getDefaultPaths(): { [index: string]: string } {
             return {
-                "jsTypes": "Core/Utilities/jsTypes",
-                "funcDef": "Core/Utilities/funcDef"
+                "jsTypes": "../Core/Utilities/jsTypes",
+                "main": "../AngularJs/main",
             };
         }
 
@@ -23,7 +22,7 @@ module KittWeb.AngularJs {
         static get getModules(): string[] { return Loader.m_modules; }
         static set setModules(value: string[]) { Loader.m_modules = value; }
 
-        constructor() { throw new Error("Cannot create new instance: KittWeb.AngularJs.Loader is static."); }        
+        constructor() { throw new Error("Cannot create new instance: KittWeb.AngularJs.Loader is static."); }
     }
 
     // Auto-initialize when imported

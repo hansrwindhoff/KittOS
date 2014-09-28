@@ -769,6 +769,9 @@
     <Content Include="Scripts\i18n\angular-locale_zh.js" />
     <Content Include="Scripts\i18n\angular-locale_zu-za.js" />
     <Content Include="Scripts\i18n\angular-locale_zu.js" />
+    <None Include="Scripts\jquery-2.1.1.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.1.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Scripts\r.js" />
     <Content Include="Scripts\require.js" />
     <Content Include="web.config" />
@@ -786,6 +789,7 @@
     <Content Include="Scripts\angular-cookies.min.js.map" />
     <Content Include="Scripts\angular-animate.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -794,8 +798,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="AngularJs\loader.ts" />
-    <TypeScriptCompile Include="AngularJs\main.ts" />
+    <TypeScriptCompile Include="AngularJs\rjsConfig.ts" />
+    <TypeScriptCompile Include="Core\Utilities\amd.ts" />
     <TypeScriptCompile Include="Core\Utilities\funcDef.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\errors.ts" />
@@ -816,7 +820,6 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-scenario.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\Collections\" />

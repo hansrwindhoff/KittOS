@@ -5,32 +5,29 @@
             var AmdBootstrap = (function () {
                 function AmdBootstrap() {
                 }
-                AmdBootstrap.appendScript = function (src, successFunc, failureFunc) {
+                AmdBootstrap.appendScript = function (src) {
                     var head = document.head || document.getElementsByTagName("head")[0];
-                    var node = document.createElement("script");
+                    var script = { node: document.createElement("script") };
+                    var node = script.node;
                     node.async = true;
                     node.setAttribute("src", src);
                     node.type = "text/javascript";
-
-                    var script = {
-                        element: node,
-                        onLoadFailureFunc: failureFunc,
-                        onLoadSuccessFunc: successFunc
-                    };
 
                     this.addEvent(node, "error", this.onImportFailure);
                     this.addEvent(node, "load", this.onImportSuccess);
 
                     head.appendChild(node);
 
-                    return script;
+                    this.m_scripts[node] = script;
+
+                    console.log(this.m_scripts);
                 };
 
                 AmdBootstrap.removeScriptEvents = function (event) {
                     var node = event.srcElement;
 
-                    this.removeEvent(node, "error", this.onImportFailure);
-                    this.removeEvent(node, "load", this.onImportSuccess);
+                    this.removeEvent(node, "error", this.onImportFailure); // remove error event
+                    this.removeEvent(node, "load", this.onImportSuccess); // remove load event
                 };
 
                 // Event Handlers
@@ -39,9 +36,9 @@
                 };
                 AmdBootstrap.onImportSuccess = function (event) {
                     AmdBootstrap.removeScriptEvents(event);
+                    AmdBootstrap.m_scripts[event.srcElement];
                 };
                 AmdBootstrap.m_scripts = {};
-                AmdBootstrap.m_queue = new Array();
                 return AmdBootstrap;
             })();
 
@@ -57,6 +54,8 @@
                     };
                 }
             })();
+
+            AmdBootstrap.appendScript("../../RequireJs/manager.js");
         })(Core.Utilities || (Core.Utilities = {}));
         var Utilities = Core.Utilities;
     })(KittWeb.Core || (KittWeb.Core = {}));

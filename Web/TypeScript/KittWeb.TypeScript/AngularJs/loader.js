@@ -1,4 +1,5 @@
-﻿var KittWeb;
+﻿/// <reference path="../RequireJs/manager.ts" />
+var KittWeb;
 (function (KittWeb) {
     (function (AngularJs) {
         var Loader = (function () {
@@ -65,6 +66,10 @@
             return Loader;
         })();
         AngularJs.Loader = Loader;
+
+        // Auto-initialize when imported
+        KittWeb.RequireJs.Manager.setConfig = Loader.getConfig;
+        KittWeb.RequireJs.Manager.setModules = Loader.getModules;
     })(KittWeb.AngularJs || (KittWeb.AngularJs = {}));
     var AngularJs = KittWeb.AngularJs;
 })(KittWeb || (KittWeb = {}));

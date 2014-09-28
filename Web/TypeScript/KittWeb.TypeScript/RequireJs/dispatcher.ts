@@ -4,7 +4,9 @@
             var w = new Worker("RequireJs/manager.js");
 
             w.addEventListener("message", (msg) => {
-                console.log(msg.data.msgContents);
+                console.log("***KittWeb.RequireJs.Manager: message recieved!***");
+                console.log("Type: " + msg.data.msgType);
+                console.log("Contents: " + msg.data.msgContents);
             });
 
             w.postMessage({ msgType: "init" });
@@ -12,10 +14,12 @@
             return w;
         })();
 
-        static bootstrap(url: string, postLoad: Function = () => { }) {
-            Dispatcher.m_worker.postMessage({ msgType: "load", path: "../AngularJs/loader.js" });
+        static importConfig(url: string) {
+            Dispatcher.m_worker.postMessage({ msgType: "importConfig", msgContents: url });
         }
 
         constructor() { throw new Error("Cannot create new instance: KittWeb.RequireJs.Dispatcher is static."); }
     }
+
+    Dispatcher.importConfig("../AngularJs/loader.js");
 }

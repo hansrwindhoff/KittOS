@@ -1,4 +1,6 @@
-﻿module KittWeb.AngularJs {
+﻿/// <reference path="../RequireJs/manager.ts" />
+
+module KittWeb.AngularJs {
     export class Loader {
         private static m_config: RequireConfig = { baseUrl: Loader.getDefaultBaseUrl, paths: Loader.getDefaultPaths }
         private static m_modules: string[] = Loader.getDefaultModules;
@@ -23,4 +25,8 @@
 
         constructor() { throw new Error("Cannot create new instance: KittWeb.AngularJs.Loader is static."); }        
     }
+
+    // Auto-initialize when imported
+    KittWeb.RequireJs.Manager.setConfig = Loader.getConfig;
+    KittWeb.RequireJs.Manager.setModules = Loader.getModules;
 }

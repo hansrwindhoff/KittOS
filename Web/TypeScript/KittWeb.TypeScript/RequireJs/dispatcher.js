@@ -5,16 +5,16 @@
             function Dispatcher() {
                 throw new Error("Cannot create new instance: KittWeb.RequireJs.Dispatcher is static.");
             }
-            Dispatcher.bootstrap = function (url, postLoad) {
-                if (typeof postLoad === "undefined") { postLoad = function () {
-                }; }
-                Dispatcher.m_worker.postMessage({ msgType: "load", path: "../AngularJs/loader.js" });
+            Dispatcher.importConfig = function (url) {
+                Dispatcher.m_worker.postMessage({ msgType: "importConfig", msgContents: url });
             };
             Dispatcher.m_worker = (function () {
                 var w = new Worker("RequireJs/manager.js");
 
                 w.addEventListener("message", function (msg) {
-                    console.log(msg.data.msgContents);
+                    console.log("***KittWeb.RequireJs.Manager: message recieved!***");
+                    console.log("Type: " + msg.data.msgType);
+                    console.log("Contents: " + msg.data.msgContents);
                 });
 
                 w.postMessage({ msgType: "init" });
@@ -23,6 +23,8 @@
             })();
             return Dispatcher;
         })();
+
+        Dispatcher.importConfig("../AngularJs/loader.js");
     })(KittWeb.RequireJs || (KittWeb.RequireJs = {}));
     var RequireJs = KittWeb.RequireJs;
 })(KittWeb || (KittWeb = {}));

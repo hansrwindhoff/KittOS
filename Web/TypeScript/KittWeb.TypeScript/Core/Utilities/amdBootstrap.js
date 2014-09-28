@@ -1,4 +1,8 @@
-﻿var KittWeb;
+﻿(function (global, undefined) {
+    global["define"];
+})(this, undefined);
+
+var KittWeb;
 (function (KittWeb) {
     (function (Core) {
         (function (Utilities) {
@@ -17,10 +21,9 @@
                     this.addEvent(node, "load", this.onImportSuccess);
 
                     head.appendChild(node);
-
-                    this.m_scripts[node] = script;
-
-                    console.log(this.m_scripts);
+                };
+                AmdBootstrap.define = function (dependencies, factoryFunc) {
+                    console.log("Hello Define.");
                 };
 
                 AmdBootstrap.removeScriptEvents = function (event) {
@@ -36,14 +39,14 @@
                 };
                 AmdBootstrap.onImportSuccess = function (event) {
                     AmdBootstrap.removeScriptEvents(event);
-                    AmdBootstrap.m_scripts[event.srcElement];
                 };
-                AmdBootstrap.m_scripts = {};
                 return AmdBootstrap;
             })();
 
             // Initialize AmdBootstrap
             (function () {
+                define = AmdBootstrap.define;
+
                 if (window.addEventListener) {
                     AmdBootstrap.addEvent = function (element, name, func) {
                         element.addEventListener(name, func, false);
@@ -55,14 +58,10 @@
                 }
             })();
 
-            AmdBootstrap.appendScript("../../RequireJs/manager.js");
+            AmdBootstrap.appendScript("Core/Utilities/funcDef.js");
         })(Core.Utilities || (Core.Utilities = {}));
         var Utilities = Core.Utilities;
     })(KittWeb.Core || (KittWeb.Core = {}));
     var Core = KittWeb.Core;
 })(KittWeb || (KittWeb = {}));
-
-// Main
-(function (global, undefined) {
-})(this, undefined);
 //# sourceMappingURL=amdBootstrap.js.map

@@ -1,11 +1,15 @@
-﻿module KittWeb.Core.Utilities {
+﻿declare var define;
+
+((global, undefined) => {
+    global["define"];
+})(this, undefined);
+
+module KittWeb.Core.Utilities {
     interface IScript {
         node: HTMLScriptElement;
     }
 
     class AmdBootstrap {
-        private static m_scripts: { [key: string]: IScript } = {};
-
         public static addEvent: (element: Element, name: string, func: EventListener) => void;
         public static removeEvent: (element: Element, name: string, func: EventListener) => void;
         public static appendScript(src: string) {
@@ -18,12 +22,11 @@
 
             this.addEvent(node, "error", this.onImportFailure);
             this.addEvent(node, "load", this.onImportSuccess);
-
+            
             head.appendChild(node);
-
-            this.m_scripts[<string><any>node] = script;
-
-            console.log(this.m_scripts);
+        }
+        public static define(dependencies: string[], factoryFunc: Function) {
+            console.log("Hello Define.");
         }
 
         private static removeScriptEvents(event) {
@@ -34,15 +37,18 @@
         }
 
         // Event Handlers
-        private static onImportFailure(event) { AmdBootstrap.removeScriptEvents(event); }
+        private static onImportFailure(event) {
+            AmdBootstrap.removeScriptEvents(event);
+        }
         private static onImportSuccess(event) {
             AmdBootstrap.removeScriptEvents(event);
-            AmdBootstrap.m_scripts[event.srcElement] 
         }
     }
 
     // Initialize AmdBootstrap
     (() => {
+        define = AmdBootstrap.define;
+
         if (window.addEventListener) {
             AmdBootstrap.addEvent = (element: Element, name: string, func: EventListener) => {
                 element.addEventListener(name, func, false);
@@ -54,10 +60,5 @@
         }
     })();
 
-    AmdBootstrap.appendScript("../../RequireJs/manager.js");
+    AmdBootstrap.appendScript("Core/Utilities/funcDef.js");
 }
-
-// Main
-((global, undefined) => {
-
-})(this, undefined);

@@ -1,0 +1,4 @@
+﻿class AmdManager {
+}
+
+export = AmdManager;

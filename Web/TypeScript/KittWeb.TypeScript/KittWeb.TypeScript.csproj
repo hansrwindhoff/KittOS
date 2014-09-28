@@ -800,6 +800,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="AngularJs\rjsConfig.ts" />
     <TypeScriptCompile Include="Core\Utilities\amdBootstrap.ts" />
+    <TypeScriptCompile Include="Core\Utilities\amdManager.ts" />
     <TypeScriptCompile Include="Core\Utilities\funcDef.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\errors.ts" />

@@ -799,7 +799,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="AngularJs\rjsConfig.ts" />
-    <TypeScriptCompile Include="Core\Utilities\amd.ts" />
+    <TypeScriptCompile Include="Core\Utilities\amdBootstrap.ts" />
     <TypeScriptCompile Include="Core\Utilities\funcDef.ts" />
     <TypeScriptCompile Include="Core\Utilities\arrayUtilities.ts" />
     <TypeScriptCompile Include="Core\Utilities\errors.ts" />

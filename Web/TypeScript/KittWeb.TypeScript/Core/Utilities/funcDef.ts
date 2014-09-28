@@ -2,19 +2,19 @@
 
 class FuncDef {
     // Helpers
-    public static truthyCall(predicateFunc: () => boolean, func: () => boolean) {
+    static truthyCall(predicateFunc: () => boolean, func: () => boolean) {
         if (predicateFunc()) { // function only executes if predicate evaluates to true
             func();
         }
     }
-    public static truthyFluid<T>(predicateFunc: () => boolean, obj: T): T {
+    static truthyFluid<T>(predicateFunc: () => boolean, obj: T): T {
         if (predicateFunc()) {
             return obj; // return obj if predicate evaluates to true
         }
 
         return null; // return null if predicate evaluates to false
     }
-    public static truthyMulti(predicates: Array<() => boolean>) {
+    static truthyMulti(predicates: Array<() => boolean>) {
         var result = predicates[0](); // get first eval result
 
         if (result && predicates.length > 1) { // exit early if false or end of array 
@@ -29,7 +29,7 @@ class FuncDef {
     }
 
     // Array Related
-    public static contains<T>(arr: T[], value: T): boolean {
+    static contains<T>(arr: T[], value: T): boolean {
         for (var i: number = 0; i < arr.length; i++) {
             if (arr[i] === value) {
                 return true;
@@ -38,7 +38,7 @@ class FuncDef {
             return false;
         }
     }
-    public static createArray<T>(length: number, defaultValue: any): T[] {
+    static createArray<T>(length: number, defaultValue: any): T[] {
         var result = new Array<T>(length);
 
         for (var i: number = 0; i < length; i++) {
@@ -49,28 +49,28 @@ class FuncDef {
     }
 
     // Object Related
-    public static isFunction(obj: any): boolean {
+    static isFunction(obj: any): boolean {
         return (typeof obj) === jsTypes.JsFunction; // return true if obj is a function
     }
-    public static isFunctionFluid<T>(obj: T): T {
+    static isFunctionFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isFunction(obj); }, obj);
     }
-    public static isNull(obj: any): boolean {
+    static isNull(obj: any): boolean {
         return obj === null; // return true if obj is null
     }
-    public static isNullFluid<T>(obj: T): T {
+    static isNullFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isNull(obj); }, obj);
     }
-    public static isNullOrUndefined(obj: any): boolean {
+    static isNullOrUndefined(obj: any): boolean {
         return this.isNull(obj) || this.isUndefined(obj); // return true if obj is not null or undefined
     }
-    public static isNullOrUndefinedFluid<T>(obj: T): T {
+    static isNullOrUndefinedFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isNullOrUndefined(obj); }, obj);
     }
-    public static isUndefined(obj: any): boolean {
+    static isUndefined(obj: any): boolean {
         return typeof (obj) === jsTypes.JsUndefined; // return true if obj is undefined
     }
-    public static isUndefinedFluid<T>(obj: T): T {
+    static isUndefinedFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isUndefined(obj); }, obj);
     }
 }

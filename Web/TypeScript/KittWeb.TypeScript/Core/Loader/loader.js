@@ -40,39 +40,29 @@
             }
             AmdLoader.define = function (d /*ignored*/ , factory) {
             };
+            AmdLoader.importScript = function (src, successFunc, failureFunc) {
+                var ff = function (event) {
+                    dff(event);
 
-            AmdLoader.importScript = function (src, id, successFunc, failureFunc) {
-                var defaultFailureFunc = function (event) {
-                    console.log("errored");
+                    if (failureFunc) {
+                        failureFunc(event);
+                    }
                 };
-                var defaultSuccessFunc = function (event) {
-                    console.log("loaded");
+
+                var dff = function (event) {
+                    console.log("failure");
+                    AmdUtilities.removeEvent(event.srcElement, "error", ff);
                 };
-                var eventsFunc = function (node) {
+
+                var aef = function (node) {
                     // Error event handling
-                    AmdUtilities.addEvent(node, "error", function (event) {
-                        defaultFailureFunc(event);
-
-                        if (failureFunc) {
-                            failureFunc(event);
-                        }
-                    });
-
-                    // Load event handling
-                    AmdUtilities.addEvent(node, "load", function (event) {
-                        defaultSuccessFunc(event);
-
-                        if (successFunc) {
-                            successFunc(event);
-                        }
-                    });
+                    AmdUtilities.addEvent(node, "error", ff);
                 };
 
-                var node = AmdUtilities.createScriptNode(src, eventsFunc);
+                var node = AmdUtilities.createScriptNode(src, aef);
 
-                AmdUtilities.appendScriptNode(node);
+                AmdUtilities.appendScriptNode(node); // append element to doc head
             };
-            AmdLoader.m_modules = {};
             return AmdLoader;
         })();
         Core.AmdLoader = AmdLoader;
@@ -83,6 +73,6 @@
 (function (global, undefined) {
     global["define"] = KittWeb.Core.AmdLoader.define;
 
-    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.j", "");
+    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.s");
 })(this, undefined);
 //# sourceMappingURL=loader.js.map

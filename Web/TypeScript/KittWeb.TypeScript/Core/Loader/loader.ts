@@ -34,31 +34,27 @@ module KittWeb.Core {
     })();
 
     export class AmdLoader {
-        private static m_modules: { [key: string]: Function; } = {};
-
         static define(d: any /*ignored*/, factory: Function) { }
+        static importScript(src: string, successFunc?: EventListener, failureFunc?: EventListener) {
+            var ff = (event: Event) => { // failure func
+                dff(event);
 
-        static importScript(src: string, id: string, successFunc?: EventListener, failureFunc?: EventListener) {
-            var defaultFailureFunc = (event) => { console.log("errored"); };
-            var defaultSuccessFunc = (event) => { console.log("loaded"); };
-            var eventsFunc = (node) => {
+                if (failureFunc) { failureFunc(event); }
+            };
+
+            var dff = (event: Event) => { // default failure func
+                console.log("failure");
+                AmdUtilities.removeEvent(event.srcElement, "error", ff);
+            };
+
+            var aef = (node: HTMLScriptElement) => { // add events func
                 // Error event handling
-                AmdUtilities.addEvent(node, "error", (event) => {
-                    defaultFailureFunc(event);
-
-                    if (failureFunc) { failureFunc(event); }
-                });
-                // Load event handling
-                AmdUtilities.addEvent(node, "load", (event) => {
-                    defaultSuccessFunc(event);
-
-                    if (successFunc) { successFunc(event); }
-                });
+                AmdUtilities.addEvent(node, "error", ff);
             };
             
-            var node = AmdUtilities.createScriptNode(src, eventsFunc);
+            var node = AmdUtilities.createScriptNode(src, aef); // create script element
 
-            AmdUtilities.appendScriptNode(node);
+            AmdUtilities.appendScriptNode(node); // append element to doc head
         }
     }
 }
@@ -66,5 +62,5 @@ module KittWeb.Core {
 ((global, undefined) => {
     global["define"] = KittWeb.Core.AmdLoader.define;
 
-    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.j", "");
+    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.s");
 })(this, undefined);

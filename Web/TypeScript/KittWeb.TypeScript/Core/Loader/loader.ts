@@ -2,7 +2,7 @@
 
 module KittWeb.Core {
     export class AmdUtilities {
-        static addEvent: (element: Element, name: string, func: EventListener) => void;
+        static addEvent: (element: Element, name: string, func: EventListener) => Function;
         static removeEvent: (element: Element, name: string, func: EventListener) => void;
         static appendScriptNode(node: HTMLScriptElement) {
             var head: HTMLHeadElement = document.head || document.getElementsByTagName("head")[0];
@@ -25,6 +25,12 @@ module KittWeb.Core {
         if (window.addEventListener) {
             AmdUtilities.addEvent = (element: Element, name: string, func: EventListener) => {
                 element.addEventListener(name, func, false);
+
+                var inverse = () => {
+                    element.removeEventListener(name, func, false);
+                };
+
+                return inverse;
             };
 
             AmdUtilities.removeEvent = (element: Element, name: string, func: EventListener) => {
@@ -36,24 +42,24 @@ module KittWeb.Core {
     export class AmdLoader {
         static define(d: any /*ignored*/, factory: Function) { }
         static importScript(src: string, successFunc?: EventListener, failureFunc?: EventListener) {
-            var ff = (event: Event) => { // failure func
-                dff(event);
-
-                if (failureFunc) { failureFunc(event); }
+            var ffw = (event: Event) => { // define failure event listener
+                bomb(event);
+                failureFunc(event);
+            };
+            var sfw = (event: Event) => { // define success event listener
+                bomb(event);
+                successFunc(event);
+            };
+            var bomb = (event: Event) => { // remove event listeners
+                AmdUtilities.removeEvent(event.srcElement, "error", ffw);
+                AmdUtilities.removeEvent(event.srcElement, "load", sfw);
+            };
+            var aEF = (node: HTMLScriptElement) => { // define add event listeners func
+                AmdUtilities.addEvent(node, "error", ffw);
+                AmdUtilities.addEvent(node, "load", sfw);
             };
 
-            var dff = (event: Event) => { // default failure func
-                console.log("failure");
-                AmdUtilities.removeEvent(event.srcElement, "error", ff);
-            };
-
-            var aef = (node: HTMLScriptElement) => { // add events func
-                // Error event handling
-                AmdUtilities.addEvent(node, "error", ff);
-            };
-            
-            var node = AmdUtilities.createScriptNode(src, aef); // create script element
-
+            var node = AmdUtilities.createScriptNode(src, aEF); // create script element
             AmdUtilities.appendScriptNode(node); // append element to doc head
         }
     }
@@ -62,5 +68,8 @@ module KittWeb.Core {
 ((global, undefined) => {
     global["define"] = KittWeb.Core.AmdLoader.define;
 
-    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.s");
+    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.js",
+        () => { console.log("you win"); },
+        () => { console.log("you lose"); }
+    );
 })(this, undefined);

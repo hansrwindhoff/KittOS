@@ -6,6 +6,7 @@
             }
             AmdUtilities.appendScriptNode = function (node) {
                 var head = document.head || document.getElementsByTagName("head")[0];
+
                 head.appendChild(node); // append to document header
             };
             AmdUtilities.createScriptNode = function (src, addEventsFunc) {
@@ -28,11 +29,10 @@
                 AmdUtilities.addEvent = function (element, name, func) {
                     element.addEventListener(name, func, false);
 
-                    var inverse = function () {
+                    // return a function that'll revert this add
+                    return function () {
                         element.removeEventListener(name, func, false);
                     };
-
-                    return inverse;
                 };
 
                 AmdUtilities.removeEvent = function (element, name, func) {
@@ -44,7 +44,7 @@
         var AmdLoader = (function () {
             function AmdLoader() {
             }
-            AmdLoader.define = function (d /*ignored*/ , factory) {
+            AmdLoader.define = function (d, factory) {
             };
             AmdLoader.importScript = function (src, successFunc, failureFunc) {
                 var ffw = function (event) {
@@ -75,12 +75,12 @@
 })(KittWeb || (KittWeb = {}));
 
 (function (global, undefined) {
-    global["define"] = KittWeb.Core.AmdLoader.define;
+    global["define"] = KittWeb.Core.AmdLoader.define; // TEMPORARY HACK
 
-    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.js", function () {
-        console.log("you win");
+    KittWeb.Core.AmdLoader.importScript("someScriptFile.js", function () {
+        console.log("import succeeded");
     }, function () {
-        console.log("you lose");
+        console.log("import failed");
     });
 })(this, undefined);
 //# sourceMappingURL=loader.js.map

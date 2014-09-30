@@ -6,6 +6,7 @@ module KittWeb.Core {
         static removeEvent: (element: Element, name: string, func: EventListener) => void;
         static appendScriptNode(node: HTMLScriptElement) {
             var head: HTMLHeadElement = document.head || document.getElementsByTagName("head")[0];
+
             head.appendChild(node); // append to document header
         }
         static createScriptNode(src: string, addEventsFunc: (node: HTMLScriptElement) => any): HTMLScriptElement {
@@ -26,11 +27,8 @@ module KittWeb.Core {
             AmdUtilities.addEvent = (element: Element, name: string, func: EventListener) => {
                 element.addEventListener(name, func, false);
 
-                var inverse = () => {
-                    element.removeEventListener(name, func, false);
-                };
-
-                return inverse;
+                // return a function that'll revert this add
+                return () => { element.removeEventListener(name, func, false); };
             };
 
             AmdUtilities.removeEvent = (element: Element, name: string, func: EventListener) => {
@@ -40,7 +38,7 @@ module KittWeb.Core {
     })();
 
     export class AmdLoader {
-        static define(d: any /*ignored*/, factory: Function) { }
+        static define(d: any, factory: Function) { } // hack to support importing of AMD based scripts; WARNING: dependencies are ignored!
         static importScript(src: string, successFunc?: EventListener, failureFunc?: EventListener) {
             var ffw = (event: Event) => { // define failure event listener
                 bomb(event);
@@ -66,10 +64,10 @@ module KittWeb.Core {
 }
 
 ((global, undefined) => {
-    global["define"] = KittWeb.Core.AmdLoader.define;
+    global["define"] = KittWeb.Core.AmdLoader.define; // TEMPORARY HACK
 
-    KittWeb.Core.AmdLoader.importScript("../../RequireJs/manager.js",
-        () => { console.log("you win"); },
-        () => { console.log("you lose"); }
-    );
+    KittWeb.Core.AmdLoader.importScript("someScriptFile.js",
+        () => { console.log("import succeeded"); },
+        () => { console.log("import failed"); }
+        );
 })(this, undefined);

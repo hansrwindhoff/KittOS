@@ -2,12 +2,12 @@
     var JsTypes = (function () {
         function JsTypes() {
         }
-        JsTypes.JsBoolean = "boolean";
-        JsTypes.JsFunction = "function";
-        JsTypes.JsNumber = "number";
-        JsTypes.JsObject = "object";
-        JsTypes.JsString = "string";
-        JsTypes.JsUndefined = "undefined";
+        JsTypes.jsBoolean = "boolean";
+        JsTypes.jsFunction = "function";
+        JsTypes.jsNumber = "number";
+        JsTypes.jsObject = "object";
+        JsTypes.jsString = "string";
+        JsTypes.jsUndefined = "undefined";
         return JsTypes;
     })();
 

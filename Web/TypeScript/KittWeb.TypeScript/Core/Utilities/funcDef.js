@@ -53,7 +53,7 @@
 
         // Object Related
         FuncDef.isFunction = function (obj) {
-            return (typeof obj) === jsTypes.JsFunction;
+            return (typeof obj) === jsTypes.jsFunction;
         };
         FuncDef.isFunctionFluid = function (obj) {
             var _this = this;
@@ -80,7 +80,7 @@
             }, obj);
         };
         FuncDef.isUndefined = function (obj) {
-            return typeof (obj) === jsTypes.JsUndefined;
+            return typeof (obj) === jsTypes.jsUndefined;
         };
         FuncDef.isUndefinedFluid = function (obj) {
             var _this = this;

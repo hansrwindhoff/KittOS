@@ -1,6 +1,28 @@
 ﻿var KittWeb;
 (function (KittWeb) {
     (function (Core) {
+        var AmdModule = (function () {
+            function AmdModule(dependencies, factoryFunc) {
+                this.m_dependencies = dependencies;
+                this.m_factoryFunc = factoryFunc;
+            }
+            Object.defineProperty(AmdModule.prototype, "dependencies", {
+                get: function () {
+                    return this.m_dependencies;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(AmdModule.prototype, "factoryFunc", {
+                get: function () {
+                    return this.m_factoryFunc;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return AmdModule;
+        })();
+        Core.AmdModule = AmdModule;
         var AmdUtilities = (function () {
             function AmdUtilities() {
             }
@@ -37,17 +59,14 @@
                         element.removeEventListener(name, func, false);
                     };
                 };
-
-                AmdUtilities.removeEvent = function (element, name, func) {
-                    element.removeEventListener(name, func, false);
-                };
             }
         })();
 
         var AmdLoader = (function () {
             function AmdLoader() {
             }
-            AmdLoader.define = function (d, factory) {
+            AmdLoader.define = function (dependencies, factory) {
+                AmdLoader.pendingModules.push(new AmdModule(dependencies, factory));
             };
             AmdLoader.importScript = function (src, successFunc, failureFunc) {
                 var aEF = function (node) {
@@ -78,6 +97,7 @@
 
                 return invertAppend;
             };
+            AmdLoader.pendingModules = new Array();
             return AmdLoader;
         })();
         Core.AmdLoader = AmdLoader;
@@ -86,12 +106,8 @@
 })(KittWeb || (KittWeb = {}));
 
 (function (global, undefined) {
-    global["define"] = KittWeb.Core.AmdLoader.define; // TEMPORARY HACK
+    global["define"] = KittWeb.Core.AmdLoader.define;
 
-    KittWeb.Core.AmdLoader.importScript("manager.j", function () {
-        console.log("import succeeded");
-    }, function () {
-        console.log("import failed");
-    });
+    KittWeb.Core.AmdLoader.importScript("Core/Utilities/jsTypes.js");
 })(this, undefined);
 //# sourceMappingURL=loader.js.map

@@ -33,7 +33,6 @@
                 AmdUtilities.addEvent = function (element, name, func) {
                     element.addEventListener(name, func, false);
 
-                    // return a function that'll revert this add
                     return function () {
                         element.removeEventListener(name, func, false);
                     };
@@ -55,11 +54,15 @@
                     var ffw = function (event) {
                         bomb(event); // detonate bomb
                         invertAppend(); // remove script
-                        failureFunc(event); // call custom failure func
+                        if (failureFunc) {
+                            failureFunc(event);
+                        }
                     };
                     var sfw = function (event) {
                         bomb(event); // detonate bomb
-                        successFunc(event); // call custom success func
+                        if (successFunc) {
+                            successFunc(event);
+                        }
                     };
                     var bomb = function (event) {
                         invertError(); // remove error event

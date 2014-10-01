@@ -29,7 +29,6 @@ module KittWeb.Core {
             AmdUtilities.addEvent = (element: Element, name: string, func: EventListener) => {
                 element.addEventListener(name, func, false);
 
-                // return a function that'll revert this add
                 return () => { element.removeEventListener(name, func, false); };
             };
 
@@ -46,19 +45,19 @@ module KittWeb.Core {
                 var ffw = (event: Event) => { // define failure event listener
                     bomb(event); // detonate bomb
                     invertAppend(); // remove script
-                    failureFunc(event); // call custom failure func
+                    if (failureFunc) { failureFunc(event); } // call custom failure event listener
                 };
                 var sfw = (event: Event) => { // define success event listener
                     bomb(event); // detonate bomb
-                    successFunc(event); // call custom success func
+                    if (successFunc) { successFunc(event); } // call custom success event listener
                 };
                 var bomb = (event: Event) => { // set us up the bomb
                     invertError(); // remove error event
                     invertLoad();  // remove load event
                 };
 
-                var invertError = AmdUtilities.addEvent(node, "error", ffw); // add error event; save a function that removes the error event
-                var invertLoad = AmdUtilities.addEvent(node, "load", sfw); // add load event; save a function that removes the load event
+                var invertError = AmdUtilities.addEvent(node, "error", ffw); // add error event to node; save a function that removes the error event
+                var invertLoad = AmdUtilities.addEvent(node, "load", sfw); // add load event to node; save a function that removes the load event
             };
 
             var node = AmdUtilities.createScriptNode(src, aEF); // create script element
@@ -75,5 +74,5 @@ module KittWeb.Core {
     KittWeb.Core.AmdLoader.importScript("manager.j",
         () => { console.log("import succeeded"); },
         () => { console.log("import failed"); }
-    );
+        );
 })(this, undefined);

@@ -8,6 +8,10 @@
                 var head = document.head || document.getElementsByTagName("head")[0];
 
                 head.appendChild(node); // append to document header
+
+                return function () {
+                    head.removeChild(node);
+                };
             };
             AmdUtilities.createScriptNode = function (src, addEventsFunc) {
                 var node = document.createElement("script");
@@ -47,25 +51,29 @@
             AmdLoader.define = function (d, factory) {
             };
             AmdLoader.importScript = function (src, successFunc, failureFunc) {
-                var ffw = function (event) {
-                    bomb(event);
-                    failureFunc(event);
-                };
-                var sfw = function (event) {
-                    bomb(event);
-                    successFunc(event);
-                };
-                var bomb = function (event) {
-                    AmdUtilities.removeEvent(event.srcElement, "error", ffw);
-                    AmdUtilities.removeEvent(event.srcElement, "load", sfw);
-                };
                 var aEF = function (node) {
-                    AmdUtilities.addEvent(node, "error", ffw);
-                    AmdUtilities.addEvent(node, "load", sfw);
+                    var ffw = function (event) {
+                        bomb(event); // detonate bomb
+                        invertAppend(); // remove script
+                        failureFunc(event); // call custom failure func
+                    };
+                    var sfw = function (event) {
+                        bomb(event); // detonate bomb
+                        successFunc(event); // call custom success func
+                    };
+                    var bomb = function (event) {
+                        invertError(); // remove error event
+                        invertLoad(); // remove load event
+                    };
+
+                    var invertError = AmdUtilities.addEvent(node, "error", ffw);
+                    var invertLoad = AmdUtilities.addEvent(node, "load", sfw);
                 };
 
                 var node = AmdUtilities.createScriptNode(src, aEF);
-                AmdUtilities.appendScriptNode(node); // append element to doc head
+                var invertAppend = AmdUtilities.appendScriptNode(node);
+
+                return invertAppend;
             };
             return AmdLoader;
         })();
@@ -77,7 +85,7 @@
 (function (global, undefined) {
     global["define"] = KittWeb.Core.AmdLoader.define; // TEMPORARY HACK
 
-    KittWeb.Core.AmdLoader.importScript("someScriptFile.js", function () {
+    KittWeb.Core.AmdLoader.importScript("manager.j", function () {
         console.log("import succeeded");
     }, function () {
         console.log("import failed");

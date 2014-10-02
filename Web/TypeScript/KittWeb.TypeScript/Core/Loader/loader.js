@@ -3,23 +3,9 @@
     (function (Core) {
         var AmdModule = (function () {
             function AmdModule(dependencies, factoryFunc) {
-                this.m_dependencies = dependencies;
-                this.m_factoryFunc = factoryFunc;
+                this.dependencies = dependencies;
+                this.factoryFunc = factoryFunc;
             }
-            Object.defineProperty(AmdModule.prototype, "dependencies", {
-                get: function () {
-                    return this.m_dependencies;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AmdModule.prototype, "factoryFunc", {
-                get: function () {
-                    return this.m_factoryFunc;
-                },
-                enumerable: true,
-                configurable: true
-            });
             return AmdModule;
         })();
         Core.AmdModule = AmdModule;
@@ -35,13 +21,11 @@
                     head.removeChild(node);
                 };
             };
-            AmdUtilities.createScriptNode = function (src, addEventsFunc) {
+            AmdUtilities.createScriptNode = function (src) {
                 var node = document.createElement("script");
                 node.async = true;
                 node.setAttribute("src", src);
                 node.type = "text/javascript";
-
-                addEventsFunc(node); // add events to script node
 
                 return node;
             };
@@ -69,30 +53,28 @@
                 AmdLoader.pendingModules.push(new AmdModule(dependencies, factory));
             };
             AmdLoader.importScript = function (src, successFunc, failureFunc) {
-                var aEF = function (node) {
-                    var ffw = function (event) {
-                        bomb(event); // detonate bomb
-                        invertAppend(); // remove script
-                        if (failureFunc) {
-                            failureFunc(event);
-                        }
-                    };
-                    var sfw = function (event) {
-                        bomb(event); // detonate bomb
-                        if (successFunc) {
-                            successFunc(event);
-                        }
-                    };
-                    var bomb = function (event) {
-                        invertError(); // remove error event
-                        invertLoad(); // remove load event
-                    };
+                var node = AmdUtilities.createScriptNode(src);
 
-                    var invertError = AmdUtilities.addEvent(node, "error", ffw);
-                    var invertLoad = AmdUtilities.addEvent(node, "load", sfw);
+                var ffw = function (event) {
+                    bomb(event); // detonate bomb
+                    invertAppend(); // remove script
+                    if (failureFunc) {
+                        failureFunc(event);
+                    }
+                };
+                var sfw = function (event) {
+                    bomb(event); // detonate bomb
+                    if (successFunc) {
+                        successFunc(event);
+                    }
+                };
+                var bomb = function (event) {
+                    invertError(); // remove error event
+                    invertLoad(); // remove load event
                 };
 
-                var node = AmdUtilities.createScriptNode(src, aEF);
+                var invertError = AmdUtilities.addEvent(node, "error", ffw);
+                var invertLoad = AmdUtilities.addEvent(node, "load", sfw);
                 var invertAppend = AmdUtilities.appendScriptNode(node);
 
                 return invertAppend;

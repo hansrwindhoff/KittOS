@@ -2,19 +2,12 @@
 
 module KittWeb.Core {
     export class AmdModule {
-        private m_dependencies: string[];
-        private m_factoryFunc: Function;
-
-        get dependencies() {
-            return this.m_dependencies;
-        }
-        get factoryFunc() {
-            return this.m_factoryFunc;
-        }
+        dependencies:string[];
+        factoryFunc: Function;
 
         constructor(dependencies: string[], factoryFunc: Function) {
-            this.m_dependencies = dependencies;
-            this.m_factoryFunc = factoryFunc;
+            this.dependencies = dependencies;
+            this.factoryFunc = factoryFunc;
         }
     }
     export class AmdUtilities {
@@ -26,13 +19,11 @@ module KittWeb.Core {
 
             return () => { head.removeChild(node); } // return inverse
         }
-        static createScriptNode(src: string, addEventsFunc: (node: HTMLScriptElement) => any): HTMLScriptElement {
+        static createScriptNode(src: string): HTMLScriptElement {
             var node: HTMLScriptElement = document.createElement("script");
             node.async = true;
             node.setAttribute("src", src);
             node.type = "text/javascript";
-
-            addEventsFunc(node); // add events to script node
 
             return node;
         }
@@ -56,26 +47,24 @@ module KittWeb.Core {
             AmdLoader.pendingModules.push(new AmdModule(dependencies, factory));
         }
         static importScript(src: string, successFunc?: EventListener, failureFunc?: EventListener): Function {
-            var aEF = (node: HTMLScriptElement) => { // define add event listeners func
-                var ffw = (event: Event) => { // define failure event listener
-                    bomb(event); // detonate bomb
-                    invertAppend(); // remove script
-                    if (failureFunc) { failureFunc(event); } // call custom failure event listener
-                };
-                var sfw = (event: Event) => { // define success event listener
-                    bomb(event); // detonate bomb
-                    if (successFunc) { successFunc(event); } // call custom success event listener
-                };
-                var bomb = (event: Event) => { // set us up the bomb
-                    invertError(); // remove error event
-                    invertLoad();  // remove load event
-                };
+            var node = AmdUtilities.createScriptNode(src); // create script element
 
-                var invertError = AmdUtilities.addEvent(node, "error", ffw); // add error event to node; save a function that removes the error event
-                var invertLoad = AmdUtilities.addEvent(node, "load", sfw); // add load event to node; save a function that removes the load event
+            var ffw = (event: Event) => { // define failure event listener
+                bomb(event); // detonate bomb
+                invertAppend(); // remove script
+                if (failureFunc) { failureFunc(event); } // call custom failure event listener
+            };
+            var sfw = (event: Event) => { // define success event listener
+                bomb(event); // detonate bomb
+                if (successFunc) { successFunc(event); } // call custom success event listener
+            };
+            var bomb = (event: Event) => { // set us up the bomb
+                invertError(); // remove error event
+                invertLoad();  // remove load event
             };
 
-            var node = AmdUtilities.createScriptNode(src, aEF); // create script element
+            var invertError = AmdUtilities.addEvent(node, "error", ffw); // add error event to node; save a function that removes the error event
+            var invertLoad = AmdUtilities.addEvent(node, "load", sfw); // add load event to node; save a function that removes the load event
             var invertAppend = AmdUtilities.appendScriptNode(node); // append element to doc head; save a function that removes the script
 
             return invertAppend; // return a function that removes the script

@@ -34,8 +34,8 @@
 
 module ktw {
     export interface IIterator<T> {
-        hasNext: boolean;
-        next: T;
+        hasNext(): boolean;
+        next(): T;
     }
     export interface IPredicate { (...any): boolean; }
     export interface IWrapper<T> { (): T; }
@@ -44,10 +44,10 @@ module ktw {
         private m_collection: Array<T>;
         private m_position: number = 0;
 
-        get hasNext() {
+        hasNext() {
             return this.m_position < this.m_collection.length;
         }
-        get next() {
+        next() {
             var result: T;
 
             if (this.hasNext) {
@@ -55,13 +55,46 @@ module ktw {
                 this.m_position++;
             }
 
-            return result || null;
+            return result;
         }
 
         constructor(collection: Array<T>) {
             this.m_collection = collection;
         }
     }
+    export class FilterIterator<T> extends Iterator<T> {
+        private m_predicate: IPredicate;
+
+        constructor(collection: Array<T>, predicate: IPredicate) {
+            super(collection);
+            this.m_predicate = predicate;
+        }
+
+        next() {
+            while (this.hasNext()) {
+                var result = super.next();
+
+                if (this.m_predicate(result)) {
+                    return result;
+                }
+            }
+        }
+    }
+    export class MapIterator<T> extends Iterator<T> {
+        private m_func: Function;
+
+        constructor(collection: Array<T>, func: Function) {
+            super(collection);
+            this.m_func = func;
+        }
+
+        next() {
+            while (this.hasNext()) {
+                return this.m_func(super.next());
+            }
+        }
+    }
+
     export class JsTypes {
         static jsArray = "Array";
         static jsBoolean = "Boolean";
@@ -152,25 +185,28 @@ module ktw {
 var a = [1, 2, 3];
 var b = ["one", "two", "three"];
 
-var cubed = a.map((a) => {
-    return a * a * a;
-});
-var squared = a.map((a) => {
-    return a * a;
-});
+var cubed = a.map((a) => { return a * a * a; });
+// [1, 8, 27]
+
+var squared = a.map((a) => { return a * a; });
+// [1, 4, 9]
+
 var flattened = [a, b].flatten();
-var zipped = a.zip(b, (a, b) => { return { number: a, string: b }; });
+// [1, 2, 3, "one", "two", "three"]
+
+var zipped = a.zip(b, (a, b) => { return { A: a, B: b }; });
+// [{A:1, B:"one"}, {A:2, B:"two"}, {A:3, B:"three"}]
 
 console.log(JSON.stringify(cubed));
 console.log(JSON.stringify(squared));
 console.log(JSON.stringify(flattened));
 console.log(JSON.stringify(zipped));
 
-var it = new ktw.Iterator([1, 2, 3, 4, 5]);
+var it = new ktw.MapIterator([1, 2, 3, 4, 5], (a) => { return a * a; });
 
-console.log(it.next);
-console.log(it.next);
-console.log(it.next);
-console.log(it.next);
-console.log(it.next);
-console.log(it.next);
+console.log(it.next()); // 1
+console.log(it.next()); // 2
+console.log(it.next()); // 3
+console.log(it.next()); // 4
+console.log(it.next()); // 5
+console.log(it.next()); // undefined

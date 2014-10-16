@@ -32,7 +32,8 @@
     };
 })(this, undefined);
 
-module ktw {
+module ktw {      
+    export interface IComparer<T> { (left: T, right: T): number; }
     export interface IIterator<T> {
         hasNext(): boolean;
         next(): T;
@@ -182,19 +183,21 @@ module ktw {
     }
 }
 
-var a = [1, 2, 3, 4, 5];
-var b = ["one", "two", "three", "four", "five"];
+var numbers = [1, 2, 3, 4, 5];
+var cube = (num) => { return num * num * num; };
+var ltFourFilter = (item) => { return item < 4; };
 
-var cubed = new ktw.MapIterator(a, (item) => { return item * item * item; });
-console.log(cubed.next()); // 1
-console.log(cubed.next()); // 8
-console.log(cubed.next()); // 27
-console.log(cubed.next()); // 64
-console.log(cubed.next()); // 100
-console.log(cubed.next()); // undefined
+var cubedNumbers = new ktw.MapIterator(numbers, cube);
 
-var ltFour = new ktw.FilterIterator(a, (item) => { return item < 4; });
-console.log(ltFour.next()); // 1
-console.log(ltFour.next()); // 2
-console.log(ltFour.next()); // 3
-console.log(ltFour.next()); // undefined
+console.log(cubedNumbers.next()); // 1
+console.log(cubedNumbers.next()); // 8
+console.log(cubedNumbers.next()); // 27
+console.log(cubedNumbers.next()); // 64
+console.log(cubedNumbers.next()); // 100
+console.log(cubedNumbers.next()); // undefined
+
+var ltFourNumbers = new ktw.FilterIterator(numbers, ltFourFilter);
+console.log(ltFourNumbers.next()); // 1
+console.log(ltFourNumbers.next()); // 2
+console.log(ltFourNumbers.next()); // 3
+console.log(ltFourNumbers.next()); // undefined

@@ -182,31 +182,19 @@ module ktw {
     }
 }
 
-var a = [1, 2, 3];
-var b = ["one", "two", "three"];
+var a = [1, 2, 3, 4, 5];
+var b = ["one", "two", "three", "four", "five"];
 
-var cubed = a.map((a) => { return a * a * a; });
-// [1, 8, 27]
+var cubed = new ktw.MapIterator(a, (item) => { return item * item * item; });
+console.log(cubed.next()); // 1
+console.log(cubed.next()); // 8
+console.log(cubed.next()); // 27
+console.log(cubed.next()); // 64
+console.log(cubed.next()); // 100
+console.log(cubed.next()); // undefined
 
-var squared = a.map((a) => { return a * a; });
-// [1, 4, 9]
-
-var flattened = [a, b].flatten();
-// [1, 2, 3, "one", "two", "three"]
-
-var zipped = a.zip(b, (a, b) => { return { A: a, B: b }; });
-// [{A:1, B:"one"}, {A:2, B:"two"}, {A:3, B:"three"}]
-
-console.log(JSON.stringify(cubed));
-console.log(JSON.stringify(squared));
-console.log(JSON.stringify(flattened));
-console.log(JSON.stringify(zipped));
-
-var it = new ktw.MapIterator([1, 2, 3, 4, 5], (a) => { return a * a; });
-
-console.log(it.next()); // 1
-console.log(it.next()); // 2
-console.log(it.next()); // 3
-console.log(it.next()); // 4
-console.log(it.next()); // 5
-console.log(it.next()); // undefined
+var ltFour = new ktw.FilterIterator(a, (item) => { return item < 4; });
+console.log(ltFour.next()); // 1
+console.log(ltFour.next()); // 2
+console.log(ltFour.next()); // 3
+console.log(ltFour.next()); // undefined

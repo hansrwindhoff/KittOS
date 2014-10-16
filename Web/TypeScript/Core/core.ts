@@ -27,9 +27,6 @@
 
             return uuid;
         }
-        static hasFlag(value: number, flag: number): boolean {
-            return (value & flag) != 0;
-        }
         static hashFnv1a(str: string, offset: number = 2166136261): number {
             // https://gist.github.com/vaiorabbit/5657561
             // http://isthe.com/chongo/tech/comp/fnv/
@@ -74,6 +71,9 @@
         static not(predicate: IPredicate): IPredicate {
             return (args: IArguments) => { return !predicate(args); }
         }
+        static wrap<T>(value: T): () => T {
+            return () => { return value; }
+        }
 
         private static getClass(obj: Object): string {
             // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
@@ -106,7 +106,7 @@ interface Array<T> {
     };
     Array.prototype.flatMap = function (projectFunc) {
         return this
-            .map((item) => { return projectFunc(item); })
+            .map((o) => { return projectFunc(o); })
             .flatten();
     };
     Array.prototype.zip = function (otherArray, combineFunc) {

@@ -1,6 +1,67 @@
-﻿module ktw {
-    export interface IPredicate { (...any): boolean; }
+﻿interface Array<T> {
+    flatten<U>(): U[];
+    flatMap<U>(projection: (any) => U): U[];
+    zip<U>(otherArray: any[], combination: (...any) => U): U[];
+}
 
+((context, undefined) => {
+    Array.prototype.flatten = function () {
+        var results = [];
+
+        this.forEach((innerArray: any[]) => {
+            results.push.apply(results, innerArray);
+        });
+
+        return results;
+    };
+    Array.prototype.flatMap = function (projectFunc) {
+        return this
+            .map((o) => { return projectFunc(o); })
+            .flatten();
+    };
+    Array.prototype.zip = function (otherArray, combineFunc) {
+        var counter: number;
+        var length: number;
+        var results = [];
+
+        for (counter = 0, length = Math.min(this.length, otherArray.length); counter < length; counter++) {
+            results.push(combineFunc(this[counter], otherArray[counter]));
+        }
+
+        return results;
+    };
+})(this, undefined);
+
+module ktw {
+    export interface IIterator<T> {
+        hasNext: boolean;
+        next: T;
+    }
+    export interface IPredicate { (...any): boolean; }
+    export interface IWrapper<T> { (): T; }
+
+    export class Iterator<T> implements IIterator<T> {
+        private m_collection: Array<T>;
+        private m_position: number = 0;
+
+        get hasNext() {
+            return this.m_position < this.m_collection.length;
+        }
+        get next() {
+            var result: T;
+
+            if (this.hasNext) {
+                result = this.m_collection[this.m_position];
+                this.m_position++;
+            }
+
+            return result || null;
+        }
+
+        constructor(collection: Array<T>) {
+            this.m_collection = collection;
+        }
+    }
     export class JsTypes {
         static jsArray = "Array";
         static jsBoolean = "Boolean";
@@ -69,10 +130,10 @@
         }
         static noOp(): void { }
         static not(predicate: IPredicate): IPredicate {
-            return (args: IArguments) => { return !predicate(args); }
+            return (args: IArguments) => { return !predicate(args); };
         }
-        static wrap<T>(value: T): () => T {
-            return () => { return value; }
+        static wrap<T>(value: T): IWrapper<T> {
+            return () => { return value; };
         }
 
         private static getClass(obj: Object): string {
@@ -88,40 +149,6 @@
     }
 }
 
-interface Array<T> {
-    flatten<U>(): U[];
-    flatMap<U>(projection: (any) => U): U[];
-    zip<U>(otherArray: any[], combination: (...any) => U): U[];
-}
-
-((context, undefined) => {
-    Array.prototype.flatten = function () {
-        var results = [];
-
-        this.forEach((innerArray: any[]) => {
-            results.push.apply(results, innerArray);
-        });
-
-        return results;
-    };
-    Array.prototype.flatMap = function (projectFunc) {
-        return this
-            .map((o) => { return projectFunc(o); })
-            .flatten();
-    };
-    Array.prototype.zip = function (otherArray, combineFunc) {
-        var counter: number;
-        var length: number;
-        var results = [];
-
-        for (counter = 0, length = Math.min(this.length, otherArray.length); counter < length; counter++) {
-            results.push(combineFunc(this[counter], otherArray[counter]));
-        }
-
-        return results;
-    };
-})(this, undefined);
-
 var a = [1, 2, 3];
 var b = ["one", "two", "three"];
 
@@ -134,11 +161,16 @@ var squared = a.map((a) => {
 var flattened = [a, b].flatten();
 var zipped = a.zip(b, (a, b) => { return { number: a, string: b }; });
 
-var wrap = (value) => {
-    return value;
-};
-
 console.log(JSON.stringify(cubed));
 console.log(JSON.stringify(squared));
 console.log(JSON.stringify(flattened));
 console.log(JSON.stringify(zipped));
+
+var it = new ktw.Iterator([1, 2, 3, 4, 5]);
+
+console.log(it.next);
+console.log(it.next);
+console.log(it.next);
+console.log(it.next);
+console.log(it.next);
+console.log(it.next);

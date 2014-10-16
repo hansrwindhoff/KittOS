@@ -33,7 +33,7 @@
 })(this, undefined);
 
 module ktw {      
-    export interface IComparer<T> { (left: T, right: T): number; }
+    export interface IMerger<T> { (left: T, right: T): T; }
     export interface IIterator<T> {
         hasNext(): boolean;
         next(): T;
@@ -92,6 +92,25 @@ module ktw {
         next() {
             while (this.hasNext()) {
                 return this.m_func(super.next());
+            }
+        }
+    }
+    export class ReduceIterator<T> extends Iterator<T> {
+        private m_previousValue: T = null;
+        private m_merger: IMerger<T>;
+
+        constructor(collection: Array<T>, merger: IMerger<T>) {
+            super(collection);
+            this.m_merger = merger;   
+        }
+
+        next() {
+            while (this.hasNext()) {
+                var result = this.m_merger(this.m_previousValue, super.next());
+
+                this.m_previousValue = result;
+
+                return result;
             }
         }
     }
@@ -184,20 +203,29 @@ module ktw {
 }
 
 var numbers = [1, 2, 3, 4, 5];
-var cube = (num) => { return num * num * num; };
-var ltFourFilter = (item) => { return item < 4; };
+var cube = (n) => { return n * n * n; };
+var ltFourFilter = (n) => { return n < 4; };
+var add = (n1, n2) => { return n1 + n2; };
 
-var cubedNumbers = new ktw.MapIterator(numbers, cube);
+var cubeNumbers = new ktw.MapIterator(numbers, cube);
 
-console.log(cubedNumbers.next()); // 1
-console.log(cubedNumbers.next()); // 8
-console.log(cubedNumbers.next()); // 27
-console.log(cubedNumbers.next()); // 64
-console.log(cubedNumbers.next()); // 100
-console.log(cubedNumbers.next()); // undefined
+console.log(cubeNumbers.next()); // 1
+console.log(cubeNumbers.next()); // 8
+console.log(cubeNumbers.next()); // 27
+console.log(cubeNumbers.next()); // 64
+console.log(cubeNumbers.next()); // 100
+console.log(cubeNumbers.next()); // undefined
 
 var ltFourNumbers = new ktw.FilterIterator(numbers, ltFourFilter);
 console.log(ltFourNumbers.next()); // 1
 console.log(ltFourNumbers.next()); // 2
 console.log(ltFourNumbers.next()); // 3
 console.log(ltFourNumbers.next()); // undefined
+
+var addNumbers = new ktw.ReduceIterator(numbers, add);
+console.log(addNumbers.next()); // 1
+console.log(addNumbers.next()); // 3
+console.log(addNumbers.next()); // 6
+console.log(addNumbers.next()); // 10
+console.log(addNumbers.next()); // 15
+console.log(addNumbers.next()); // undefined

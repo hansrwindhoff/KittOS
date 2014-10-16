@@ -1,0 +1,16 @@
+-- AMD
+https://github.com/amdjs/amdjs-api
+https://github.com/jrburke/almond/blob/master/almond.js
+https://github.com/jrburke/requirejs/blob/master/require.js
+https://github.com/abadc0de/amdlite/blob/master/amdlite.js
+http://libraryinstitute.wordpress.com/2010/12/01/loading-javascript-modules/
+
+-- Hashing
+http://isthe.com/chongo/tech/comp/fnv/
+
+-- Javascript
+http://bonsaiden.github.io/JavaScript-Garden/
+
+-- Typescript
+http://www.sitepen.com/blog/2013/12/31/definitive-guide-to-typescript/
+http://www.sitepen.com/blog/2013/12/31/typescript-cheat-sheet/

@@ -1,4 +1,4 @@
-﻿import jsTypes = require("jsTypes");
+﻿import JsTypes = require("jsTypes");
 
 class FuncDef {
     // Helpers
@@ -50,7 +50,7 @@ class FuncDef {
 
     // Object Related
     static isFunction(obj: any): boolean {
-        return (typeof obj) === jsTypes.jsFunction; // return true if obj is a function
+        return (typeof obj) === JsTypes.jsFunction; // return true if obj is a function
     }
     static isFunctionFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isFunction(obj); }, obj);
@@ -68,7 +68,7 @@ class FuncDef {
         return this.truthyFluid(() => { return this.isNullOrUndefined(obj); }, obj);
     }
     static isUndefined(obj: any): boolean {
-        return typeof (obj) === jsTypes.jsUndefined; // return true if obj is undefined
+        return typeof (obj) === JsTypes.jsUndefined; // return true if obj is undefined
     }
     static isUndefinedFluid<T>(obj: T): T {
         return this.truthyFluid(() => { return this.isUndefined(obj); }, obj);

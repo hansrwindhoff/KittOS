@@ -1,4 +1,4 @@
-﻿define(["require", "exports", "jsTypes"], function(require, exports, jsTypes) {
+﻿define(["require", "exports", "jsTypes"], function(require, exports, JsTypes) {
     var FuncDef = (function () {
         function FuncDef() {
         }
@@ -53,7 +53,7 @@
 
         // Object Related
         FuncDef.isFunction = function (obj) {
-            return (typeof obj) === jsTypes.jsFunction;
+            return (typeof obj) === JsTypes.jsFunction;
         };
         FuncDef.isFunctionFluid = function (obj) {
             var _this = this;
@@ -80,7 +80,7 @@
             }, obj);
         };
         FuncDef.isUndefined = function (obj) {
-            return typeof (obj) === jsTypes.jsUndefined;
+            return typeof (obj) === JsTypes.jsUndefined;
         };
         FuncDef.isUndefinedFluid = function (obj) {
             var _this = this;

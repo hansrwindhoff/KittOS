@@ -34,26 +34,26 @@
 
 module ktw {
     export interface IIterator {
-        hasNext(): boolean;
+        hasNext: boolean;
         next(): any;
     }
     export interface IMapper<T, U> { (input: T): U; }
-    export interface IPredicate { (...any): boolean; }
+    export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<T> { (left: T, right?: T): T; }
     export interface IWrapper<T> { (): T; }
 
     export class Iterator implements IIterator {
         private m_collection: Array<any>;
-        private m_position: Counter;
+        private m_position: number = 0;
 
-        hasNext(): boolean {
-            return this.m_position.value < this.m_collection.length;
+        get hasNext(): boolean {
+            return this.m_position < this.m_collection.length;
         }
         next(): any {
             if (this.hasNext) {
-                var current = this.m_collection[this.m_position.value];
+                var current = this.m_collection[this.m_position];
 
-                this.m_position.increment();
+                this.m_position++;
 
                 return current;
             }
@@ -61,7 +61,6 @@ module ktw {
 
         constructor(collection: Array<any>) {
             this.m_collection = collection;
-            this.m_position = new Counter();
         }
     }
     export class FilterIterator<T> extends Iterator {
@@ -78,10 +77,10 @@ module ktw {
             if (this.m_predicate(current)) {
                 return current;
             } else {
-                while(!this.m_predicate(current) && this.hasNext()) {
+                while (!this.m_predicate(current) && this.hasNext) {
                     current = super.next();
-                    
-                    if(this.m_predicate(current)) {
+
+                    if (this.m_predicate(current)) {
                         return current;
                     }
                 }
@@ -119,24 +118,6 @@ module ktw {
         }
     }
 
-    export class Counter {
-        private m_count: number;
-
-        get value(): number { return this.m_count; }
-
-        constructor(seed: number = 0) {
-            this.m_count = seed;
-        }
-
-        increment(n: number = 1): number {
-            this.m_count = this.m_count + n;
-            return this.m_count;
-        }
-        decrement(n: number = 1): number {
-            this.m_count = this.m_count - n;
-            return this.m_count;
-        }
-    }
     export class Helpers {
         static generateUuid() {
             // http://stackoverflow.com/a/8809472/1186165
@@ -234,17 +215,3 @@ module ktw {
         static jsUndefined = "Undefined";
     }
 }
-
-var numbers: Array<number> = [1, 10, 3, 8, 2];
-var cube: ktw.IMapper<number, number> = (n) => { return n * n * n; };
-var ltFourFilter: ktw.IPredicate = (n) => { return ktw.Helpers.lessThan(n, 4); };
-
-var maxNumbers = new ktw.ReduceIterator(numbers, ktw.Helpers.max);
-var cubeNumbers = new ktw.MapIterator(numbers, cube);
-var ltFourNumbers = new ktw.FilterIterator(numbers, ltFourFilter);
-
-console.log(ltFourNumbers.next());
-console.log(ltFourNumbers.next());
-console.log(ltFourNumbers.next());
-console.log(ltFourNumbers.next());
-console.log(ltFourNumbers.next());

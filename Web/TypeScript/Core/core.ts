@@ -39,21 +39,21 @@ module ktw {
     }
     export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...any): boolean; }
-    export interface IReducer<T> { (left: T, right: T): T; }
+    export interface IReducer<T> { (left: T, right?: T): T; }
     export interface IWrapper<T> { (): T; }
 
     export class Iterator implements IIterator {
         private m_collection: Array<any>;
-        private m_position: number = 0;
+        private m_position: Counter;
 
         hasNext(): boolean {
-            return this.m_position < this.m_collection.length;
+            return this.m_position.value < this.m_collection.length;
         }
         next(): any {
             if (this.hasNext) {
-                var current = this.m_collection[this.m_position];
+                var current = this.m_collection[this.m_position.value];
 
-                this.m_position++;
+                this.m_position.increment();
 
                 return current;
             }
@@ -61,6 +61,7 @@ module ktw {
 
         constructor(collection: Array<any>) {
             this.m_collection = collection;
+            this.m_position = new Counter();
         }
     }
     export class FilterIterator<T> extends Iterator {
@@ -74,11 +75,17 @@ module ktw {
         next(): T {
             var current: T = super.next();
 
-            while (this.hasNext() && !this.m_predicate(current)) {
-                current = super.next();
+            if (this.m_predicate(current)) {
+                return current;
+            } else {
+                while(!this.m_predicate(current) && this.hasNext()) {
+                    current = super.next();
+                    
+                    if(this.m_predicate(current)) {
+                        return current;
+                    }
+                }
             }
-
-            return current;
         }
     }
     export class MapIterator<T, U> extends Iterator {
@@ -112,19 +119,25 @@ module ktw {
         }
     }
 
-    export class JsTypes {
-        static jsArray = "Array";
-        static jsBoolean = "Boolean";
-        static jsDate = "Date";
-        static jsFunction = "Function";
-        static jsNull = "Null";
-        static jsNumber = "Number";
-        static jsObject = "Object";
-        static jsRegExp = "RegExp";
-        static jsString = "String";
-        static jsUndefined = "Undefined";
+    export class Counter {
+        private m_count: number;
+
+        get value(): number { return this.m_count; }
+
+        constructor(seed: number = 0) {
+            this.m_count = seed;
+        }
+
+        increment(n: number = 1): number {
+            this.m_count = this.m_count + n;
+            return this.m_count;
+        }
+        decrement(n: number = 1): number {
+            this.m_count = this.m_count - n;
+            return this.m_count;
+        }
     }
-    export class Utilities {
+    export class Helpers {
         static generateUuid() {
             // http://stackoverflow.com/a/8809472/1186165
 
@@ -152,48 +165,50 @@ module ktw {
 
             return hash >>> 0;
         }
+
         static isArray(obj: Object): boolean {
-            return Utilities.is(JsTypes.jsArray, obj);
+            return Helpers.is(JsTypes.jsArray, obj);
         }
         static isFunction(obj: Object): boolean {
-            return Utilities.is(JsTypes.jsFunction, obj);
+            return Helpers.is(JsTypes.jsFunction, obj);
         }
         static isNumber(str: string): boolean;
         static isNumber(num: number): boolean;
         static isNumber(obj: any): boolean {
-            if (Utilities.is(JsTypes.jsNumber, obj)) { return true; } // num overload
-            if (Utilities.is(JsTypes.jsString, obj)) { return !isNaN(obj); } // str overload
+            if (Helpers.is(JsTypes.jsNumber, obj)) { return true; } // num overload
+            if (Helpers.is(JsTypes.jsString, obj)) { return !isNaN(obj); } // str overload
 
             return false;
         }
         static isNull(obj: Object): boolean {
-            return Utilities.is(JsTypes.jsNull, obj);
+            return Helpers.is(JsTypes.jsNull, obj);
         }
         static isNullOrUndefined(obj: Object): boolean {
-            return Utilities.isNull(obj) || Utilities.isUndefined(obj);
+            return Helpers.isNull(obj) || Helpers.isUndefined(obj);
         }
         static isString(obj: Object): boolean {
-            return Utilities.is(JsTypes.jsString, obj);
+            return Helpers.is(JsTypes.jsString, obj);
         }
         static isUndefined(obj: Object): boolean {
-            return Utilities.is(JsTypes.jsUndefined, obj);
+            return Helpers.is(JsTypes.jsUndefined, obj);
         }
+
         static noOp(): void { }
         static not(predicate: IPredicate): IPredicate {
             return (args: IArguments) => { return !predicate(args); };
         }
-        static wrap<T>(value: T): IWrapper<T> {
-            return () => { return value; };
-        }
+        static wrap<T>(value: T): IWrapper<T> { return () => { return value; }; }
 
         static add: IReducer<number> = (n1, n2) => { return n1 + n2; };
         static subtract: IReducer<number> = (n1, n2) => { return n1 - n2; };
         static multiply: IReducer<number> = (n1, n2) => { return n1 * n2; };
         static divide: IReducer<number> = (n1, n2) => { return n1 / n2; };
         static remainder: IReducer<number> = (n1, n2) => { return n1 % n2; };
-        static isLessThan: IPredicate = (n1: number, n2: number) => { return n1 < n2; };
-        static isGreaterThan: IPredicate = (n1: number, n2: number) => { return n1 > n2; };
-        static isEqualTo: IPredicate = (n1: number, n2: number) => { return n1 === n2; };
+        static min: IReducer<number> = (n1, n2) => { return Math.min(n1, n2); };
+        static max: IReducer<number> = (n1, n2) => { return Math.max(n1, n2); };
+        static lessThan: IPredicate = (n1: any, n2: any) => { return n1 < n2; };
+        static greaterThan: IPredicate = (n1: any, n2: any) => { return n1 > n2; };
+        static equalTo: IPredicate = (n1: any, n2: any) => { return n1 === n2; };
 
         private static getClass(obj: Object): string {
             // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
@@ -203,17 +218,33 @@ module ktw {
             return Object.prototype.toString.call(obj).slice(8, -1);
         }
         private static is(typeName: string, obj: Object): boolean {
-            return Utilities.getClass(obj) === typeName;
+            return Helpers.getClass(obj) === typeName;
         }
+    }
+    export class JsTypes {
+        static jsArray = "Array";
+        static jsBoolean = "Boolean";
+        static jsDate = "Date";
+        static jsFunction = "Function";
+        static jsNull = "Null";
+        static jsNumber = "Number";
+        static jsObject = "Object";
+        static jsRegExp = "RegExp";
+        static jsString = "String";
+        static jsUndefined = "Undefined";
     }
 }
 
-var numbers: Array<number> = [1, 5, 4, 2, 3];
+var numbers: Array<number> = [1, 10, 3, 8, 2];
 var cube: ktw.IMapper<number, number> = (n) => { return n * n * n; };
-var ltFourFilter: ktw.IPredicate = (n) => { return ktw.Utilities.isLessThan(n, 4); };
-var cubeNumbers = new ktw.MapIterator(numbers, cube);
+var ltFourFilter: ktw.IPredicate = (n) => { return ktw.Helpers.lessThan(n, 4); };
 
+var maxNumbers = new ktw.ReduceIterator(numbers, ktw.Helpers.max);
+var cubeNumbers = new ktw.MapIterator(numbers, cube);
 var ltFourNumbers = new ktw.FilterIterator(numbers, ltFourFilter);
+
+console.log(ltFourNumbers.next());
+console.log(ltFourNumbers.next());
 console.log(ltFourNumbers.next());
 console.log(ltFourNumbers.next());
 console.log(ltFourNumbers.next());

@@ -41,7 +41,7 @@ module ktw {
     }
     export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...args: any[]): boolean; }
-    export interface IReducer<T> { (left: any, right?: any): T; }
+    export interface IReducer<T> { (...args: any[]): T; }
     export interface IWrapper<T> { (): T; }
 
     export class Iterator implements IIterator {
@@ -181,20 +181,33 @@ module ktw {
             return Helpers.is(JsTypes.jsUndefined, obj);
         }
 
-        static apply(func: Function, ...args) { return func.apply(null, args); }
-        static noOp(): void { }
-        static not(predicate: IPredicate): IPredicate {
-            return (args: IArguments) => { return !predicate(args); };
-        }
-        static pipeline(...args) {
+        static apply(func: Function, ...args): Function { return func.apply(null, args); }
+        static compose(...args): Function {
             var funcs: Array<any> = Array.prototype.slice.call(args);
 
             return (...args) => {
-                var combineFuncs = new ReduceIterator<Function>(funcs, (l: IArguments, r: Function) => {
-                    return Helpers.apply(r, l);
+                var combineFuncs = new ReduceIterator<Function>(funcs, (a: IArguments, f: Function) => {
+                    return Helpers.apply(f, a);
                 }, args);
 
                 combineFuncs.enumerate();
+            };
+        }
+        static delay(func: Function, durationMs: number = 100): number { return setTimeout(func, durationMs); }
+        static noOp(): void { }
+        static throttle(func: Function, thresholdMs?: number): Function {
+            var timeoutHandler: number;
+
+            return (...args) => {
+                var delayed = () => {
+                    timeoutHandler = null;
+                    Helpers.apply(func, args);
+                };
+
+                if (timeoutHandler) { clearTimeout(timeoutHandler); }
+                else { Helpers.apply(func, args); }
+
+                timeoutHandler = Helpers.delay(delayed, thresholdMs);
             };
         }
         static wrap<T>(value: T): IWrapper<T> { return () => { return value; }; }
@@ -206,9 +219,9 @@ module ktw {
         static remainder: IReducer<number> = (n1, n2) => { return n1 % n2; };
         static min: IReducer<number> = (n1, n2) => { return Math.min(n1, n2); };
         static max: IReducer<number> = (n1, n2) => { return Math.max(n1, n2); };
-        static lessThan: IPredicate = (n1: any, n2: any) => { return n1 < n2; };
-        static greaterThan: IPredicate = (n1: any, n2: any) => { return n1 > n2; };
-        static equalTo: IPredicate = (n1: any, n2: any) => { return n1 === n2; };
+        static lessThan: IPredicate = (l: any, r: any) => { return l < r; };
+        static greaterThan: IPredicate = (l: any, r: any) => { return l > r; };
+        static equalTo: IPredicate = (l: any, r: any) => { return l === r; };
 
         private static getClass(obj: Object): string {
             // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/

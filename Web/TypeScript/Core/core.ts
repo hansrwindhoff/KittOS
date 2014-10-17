@@ -35,7 +35,7 @@
 module ktw {
     export interface IIterator {
         hasNext(): boolean;
-        next();
+        next(): any;
     }
     export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...any): boolean; }
@@ -74,9 +74,11 @@ module ktw {
         next(): T {
             var current: T = super.next();
 
-            if (this.m_predicate(current)) {
-                return current;
+            while (this.hasNext() && !this.m_predicate(current)) {
+                current = super.next();
             }
+
+            return current;
         }
     }
     export class MapIterator<T, U> extends Iterator {
@@ -95,10 +97,10 @@ module ktw {
         private m_previous: T;
         private m_reducer: IReducer<T>;
 
-        constructor(collection: Array<T>, reducer: IReducer<T>, first: T = null) {
+        constructor(collection: Array<T>, reducer: IReducer<T>, seed: T = null) {
             super(collection);
             this.m_reducer = reducer;
-            this.m_previous = first;
+            this.m_previous = seed;
         }
 
         next(): T {
@@ -184,6 +186,15 @@ module ktw {
             return () => { return value; };
         }
 
+        static add: IReducer<number> = (n1, n2) => { return n1 + n2; };
+        static subtract: IReducer<number> = (n1, n2) => { return n1 - n2; };
+        static multiply: IReducer<number> = (n1, n2) => { return n1 * n2; };
+        static divide: IReducer<number> = (n1, n2) => { return n1 / n2; };
+        static remainder: IReducer<number> = (n1, n2) => { return n1 % n2; };
+        static isLessThan: IPredicate = (n1: number, n2: number) => { return n1 < n2; };
+        static isGreaterThan: IPredicate = (n1: number, n2: number) => { return n1 > n2; };
+        static isEqualTo: IPredicate = (n1: number, n2: number) => { return n1 === n2; };
+
         private static getClass(obj: Object): string {
             // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
             // http://bonsaiden.github.io/JavaScript-Garden/#types.typeof
@@ -197,30 +208,12 @@ module ktw {
     }
 }
 
-var numbers: Array<number> = [1, 2, 3, 4, 5];
-var cube: ktw.IMapper<number, number> = (n: number) => { return n * n * n; };
-var ltFourFilter: ktw.IPredicate = (n: number) => { return n < 4; };
-var add: ktw.IReducer<number> = (n1: number, n2: number) => { return n1 + n2; };
-
+var numbers: Array<number> = [1, 5, 4, 2, 3];
+var cube: ktw.IMapper<number, number> = (n) => { return n * n * n; };
+var ltFourFilter: ktw.IPredicate = (n) => { return ktw.Utilities.isLessThan(n, 4); };
 var cubeNumbers = new ktw.MapIterator(numbers, cube);
 
-console.log(cubeNumbers.next()); // 1
-console.log(cubeNumbers.next()); // 8
-console.log(cubeNumbers.next()); // 27
-console.log(cubeNumbers.next()); // 64
-console.log(cubeNumbers.next()); // 100
-console.log(cubeNumbers.next()); // undefined
-
 var ltFourNumbers = new ktw.FilterIterator(numbers, ltFourFilter);
-console.log(ltFourNumbers.next()); // 1
-console.log(ltFourNumbers.next()); // 2
-console.log(ltFourNumbers.next()); // 3
-console.log(ltFourNumbers.next()); // undefined
-
-var addNumbers = new ktw.ReduceIterator<number>(numbers, add);
-console.log(addNumbers.next()); // 1
-console.log(addNumbers.next()); // 3
-console.log(addNumbers.next()); // 6
-console.log(addNumbers.next()); // 10
-console.log(addNumbers.next()); // 15
-console.log(addNumbers.next()); // undefined
+console.log(ltFourNumbers.next());
+console.log(ltFourNumbers.next());
+console.log(ltFourNumbers.next());

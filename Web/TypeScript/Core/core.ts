@@ -32,38 +32,38 @@
     };
 })(this, undefined);
 
-module ktw {      
-    export interface IMerger<T> { (left: T, right: T): T; }
-    export interface IIterator<T> {
+module ktw {
+    export interface IIterator {
         hasNext(): boolean;
-        next(): T;
+        next();
     }
+    export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...any): boolean; }
+    export interface IReducer<T> { (left: T, right: T): T; }
     export interface IWrapper<T> { (): T; }
 
-    export class Iterator<T> implements IIterator<T> {
-        private m_collection: Array<T>;
+    export class Iterator implements IIterator {
+        private m_collection: Array<any>;
         private m_position: number = 0;
 
-        hasNext() {
+        hasNext(): boolean {
             return this.m_position < this.m_collection.length;
         }
-        next() {
-            var result: T;
-
+        next(): any {
             if (this.hasNext) {
-                result = this.m_collection[this.m_position];
-                this.m_position++;
-            }
+                var current = this.m_collection[this.m_position];
 
-            return result;
+                this.m_position++;
+
+                return current;
+            }
         }
 
-        constructor(collection: Array<T>) {
+        constructor(collection: Array<any>) {
             this.m_collection = collection;
         }
     }
-    export class FilterIterator<T> extends Iterator<T> {
+    export class FilterIterator<T> extends Iterator {
         private m_predicate: IPredicate;
 
         constructor(collection: Array<T>, predicate: IPredicate) {
@@ -71,47 +71,42 @@ module ktw {
             this.m_predicate = predicate;
         }
 
-        next() {
-            while (this.hasNext()) {
-                var result = super.next();
+        next(): T {
+            var current: T = super.next();
 
-                if (this.m_predicate(result)) {
-                    return result;
-                }
+            if (this.m_predicate(current)) {
+                return current;
             }
         }
     }
-    export class MapIterator<T> extends Iterator<T> {
+    export class MapIterator<T, U> extends Iterator {
         private m_func: Function;
 
-        constructor(collection: Array<T>, func: Function) {
+        constructor(collection: Array<T>, func: IMapper<T, U>) {
             super(collection);
             this.m_func = func;
         }
 
-        next() {
-            while (this.hasNext()) {
-                return this.m_func(super.next());
-            }
+        next(): U {
+            return this.m_func(super.next());
         }
     }
-    export class ReduceIterator<T> extends Iterator<T> {
-        private m_previousValue: T = null;
-        private m_merger: IMerger<T>;
+    export class ReduceIterator<T> extends Iterator {
+        private m_previous: T;
+        private m_reducer: IReducer<T>;
 
-        constructor(collection: Array<T>, merger: IMerger<T>) {
+        constructor(collection: Array<T>, reducer: IReducer<T>, first: T = null) {
             super(collection);
-            this.m_merger = merger;   
+            this.m_reducer = reducer;
+            this.m_previous = first;
         }
 
-        next() {
-            while (this.hasNext()) {
-                var result = this.m_merger(this.m_previousValue, super.next());
+        next(): T {
+            var current: T = this.m_reducer(this.m_previous, super.next());
 
-                this.m_previousValue = result;
+            this.m_previous = current;
 
-                return result;
-            }
+            return current;
         }
     }
 
@@ -202,10 +197,10 @@ module ktw {
     }
 }
 
-var numbers = [1, 2, 3, 4, 5];
-var cube = (n) => { return n * n * n; };
-var ltFourFilter = (n) => { return n < 4; };
-var add = (n1, n2) => { return n1 + n2; };
+var numbers: Array<number> = [1, 2, 3, 4, 5];
+var cube: ktw.IMapper<number, number> = (n: number) => { return n * n * n; };
+var ltFourFilter: ktw.IPredicate = (n: number) => { return n < 4; };
+var add: ktw.IReducer<number> = (n1: number, n2: number) => { return n1 + n2; };
 
 var cubeNumbers = new ktw.MapIterator(numbers, cube);
 
@@ -222,7 +217,7 @@ console.log(ltFourNumbers.next()); // 2
 console.log(ltFourNumbers.next()); // 3
 console.log(ltFourNumbers.next()); // undefined
 
-var addNumbers = new ktw.ReduceIterator(numbers, add);
+var addNumbers = new ktw.ReduceIterator<number>(numbers, add);
 console.log(addNumbers.next()); // 1
 console.log(addNumbers.next()); // 3
 console.log(addNumbers.next()); // 6

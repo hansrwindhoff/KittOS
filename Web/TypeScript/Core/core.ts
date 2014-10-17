@@ -33,13 +33,15 @@
 })(this, undefined);
 
 module ktw {
+    "use strict";
+
     export interface IIterator {
         hasNext: boolean;
         next(): any;
     }
     export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...args: any[]): boolean; }
-    export interface IReducer<T> { (left: T, right?: T): T; }
+    export interface IReducer<T> { (left: any, right?: any): T; }
     export interface IWrapper<T> { (): T; }
 
     export class Iterator implements IIterator {
@@ -48,6 +50,11 @@ module ktw {
 
         get hasNext(): boolean {
             return this.m_position < this.m_collection.length;
+        }
+        enumerate(): void {
+            while (this.hasNext) {
+                this.next();
+            }
         }
         next(): any {
             if (this.hasNext) {
@@ -103,7 +110,7 @@ module ktw {
         private m_previous: T;
         private m_reducer: IReducer<T>;
 
-        constructor(collection: Array<T>, reducer: IReducer<T>, seed: T = null) {
+        constructor(collection: Array<T>, reducer: IReducer<T>, seed: any = null) {
             super(collection);
             this.m_reducer = reducer;
             this.m_previous = seed;
@@ -174,9 +181,21 @@ module ktw {
             return Helpers.is(JsTypes.jsUndefined, obj);
         }
 
+        static apply(func: Function, ...args) { return func.apply(null, args); }
         static noOp(): void { }
         static not(predicate: IPredicate): IPredicate {
             return (args: IArguments) => { return !predicate(args); };
+        }
+        static pipeline(...args) {
+            var funcs: Array<any> = Array.prototype.slice.call(args);
+
+            return (...args) => {
+                var combineFuncs = new ReduceIterator<Function>(funcs, (l: IArguments, r: Function) => {
+                    return Helpers.apply(r, l);
+                }, args);
+
+                combineFuncs.enumerate();
+            };
         }
         static wrap<T>(value: T): IWrapper<T> { return () => { return value; }; }
 

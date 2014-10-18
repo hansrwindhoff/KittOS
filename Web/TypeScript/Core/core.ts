@@ -41,7 +41,7 @@ module ktw {
     }
     export interface IMapper<T, U> { (input: T): U; }
     export interface IPredicate { (...args: any[]): boolean; }
-    export interface IReducer<T> { (...args: any[]): T; }
+    export interface IReducer<T> { (left: any, right: any): T; }
     export interface IWrapper<T> { (): T; }
 
     export class Iterator implements IIterator {
@@ -95,22 +95,42 @@ module ktw {
         }
     }
     export class MapIterator<T, U> extends Iterator {
-        private m_func: Function;
+        private m_mapper: Function;
 
-        constructor(collection: Array<T>, func: IMapper<T, U>) {
+        constructor(collection: Array<T>, mapper: IMapper<T, U>) {
             super(collection);
-            this.m_func = func;
+            this.m_mapper = mapper;
         }
 
         next(): U {
-            return this.m_func(super.next());
+            return this.m_mapper(super.next());
+        }
+    }
+    export class MapReduceIterator<T, U, R> extends Iterator {
+        private m_mapper: Function;
+        private m_previous: R;
+        private m_reducer: IReducer<R>;
+
+        constructor(collection: Array<any>, mapper:IMapper<T, U>, reducer: IReducer<R>, seed: any = null) {
+            super(collection);
+            this.m_mapper = mapper;
+            this.m_reducer = reducer;
+            this.m_previous = seed;
+        }
+
+        next(): R {
+            var current: R = this.m_reducer(this.m_previous, this.m_mapper(super.next()));
+
+            this.m_previous = current;
+
+            return current;
         }
     }
     export class ReduceIterator<T> extends Iterator {
         private m_previous: T;
         private m_reducer: IReducer<T>;
 
-        constructor(collection: Array<T>, reducer: IReducer<T>, seed: any = null) {
+        constructor(collection: Array<any>, reducer: IReducer<T>, seed: any = null) {
             super(collection);
             this.m_reducer = reducer;
             this.m_previous = seed;
@@ -182,15 +202,21 @@ module ktw {
         }
 
         static apply(func: Function, ...args): Function { return func.apply(null, args); }
-        static compose(...args): Function {
-            var funcs: Array<any> = Array.prototype.slice.call(args);
+        static compose(...args: Array<Function>): Function {
+            var funcs: Array<Function> = Array.prototype.slice.call(args);
 
             return (...args) => {
-                var combineFuncs = new ReduceIterator<Function>(funcs, (a: IArguments, f: Function) => {
+                var sequence = new ReduceIterator<Function>(funcs, (a: IArguments, f: Function) => {
                     return Helpers.apply(f, a);
                 }, args);
 
-                combineFuncs.enumerate();
+                var result;
+
+                while (sequence.hasNext) {
+                    result = sequence.next();
+                }
+
+                return result;
             };
         }
         static delay(func: Function, durationMs: number = 100): number { return setTimeout(func, durationMs); }
@@ -246,4 +272,14 @@ module ktw {
         static jsString = "String";
         static jsUndefined = "Undefined";
     }
+}
+
+var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+var cube: ktw.IMapper<number, number> = (n) => { return n * n * n; }
+var half: ktw.IMapper<number, number> = (n) => { return n / 2; }
+var cubeHalf: ktw.IMapper<number, number> = (n) => { return ktw.Helpers.compose(cube, half)(n); };        
+var cubeHalfSum = new ktw.MapReduceIterator<number, number, number>(numbers, cubeHalf, ktw.Helpers.add, 0);
+
+while (cubeHalfSum.hasNext) {
+    console.log(cubeHalfSum.next());
 }

@@ -39,10 +39,10 @@ module ktw {
         hasNext: boolean;
         next(): any;
     }
-    export interface IMapper<T, U> { (input: T): U; }
+    export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
     export interface IPredicate { (...args: any[]): boolean; }
-    export interface IReducer<T> { (left: any, right: any): T; }
-    export interface IWrapper<T> { (): T; }
+    export interface IReducer<TResult> { (left: any, right: any): TResult; }
+    export interface IWrapper<TInput> { (): TInput; }
 
     export class Iterator implements IIterator {
         private m_collection: Array<any>;
@@ -52,9 +52,7 @@ module ktw {
             return this.m_position < this.m_collection.length;
         }
         enumerate(): void {
-            while (this.hasNext) {
-                this.next();
-            }
+            while (this.hasNext) { this.next(); }
         }
         next(): any {
             if (this.hasNext) {
@@ -95,7 +93,7 @@ module ktw {
         }
     }
     export class MapIterator<T, U> extends Iterator {
-        private m_mapper: Function;
+        private m_mapper: IMapper<T, U>;
 
         constructor(collection: Array<T>, mapper: IMapper<T, U>) {
             super(collection);
@@ -104,26 +102,6 @@ module ktw {
 
         next(): U {
             return this.m_mapper(super.next());
-        }
-    }
-    export class MapReduceIterator<T, U, R> extends Iterator {
-        private m_mapper: Function;
-        private m_previous: R;
-        private m_reducer: IReducer<R>;
-
-        constructor(collection: Array<any>, mapper:IMapper<T, U>, reducer: IReducer<R>, seed: any = null) {
-            super(collection);
-            this.m_mapper = mapper;
-            this.m_reducer = reducer;
-            this.m_previous = seed;
-        }
-
-        next(): R {
-            var current: R = this.m_reducer(this.m_previous, this.m_mapper(super.next()));
-
-            this.m_previous = current;
-
-            return current;
         }
     }
     export class ReduceIterator<T> extends Iterator {
@@ -194,6 +172,9 @@ module ktw {
         static isNullOrUndefined(obj: Object): boolean {
             return Helpers.isNull(obj) || Helpers.isUndefined(obj);
         }
+        static isObject(obj: Object): boolean {
+            return Helpers.is(JsTypes.jsObject, obj);
+        }
         static isString(obj: Object): boolean {
             return Helpers.is(JsTypes.jsString, obj);
         }
@@ -201,42 +182,49 @@ module ktw {
             return Helpers.is(JsTypes.jsUndefined, obj);
         }
 
-        static apply(func: Function, ...args): Function { return func.apply(null, args); }
-        static compose(...args: Array<Function>): Function {
-            var funcs: Array<Function> = Array.prototype.slice.call(args);
-
-            return (...args) => {
-                var sequence = new ReduceIterator<Function>(funcs, (a: IArguments, f: Function) => {
-                    return Helpers.apply(f, a);
-                }, args);
-
-                var result;
-
-                while (sequence.hasNext) {
-                    result = sequence.next();
-                }
-
-                return result;
-            };
-        }
-        static delay(func: Function, durationMs: number = 100): number { return setTimeout(func, durationMs); }
-        static noOp(): void { }
-        static throttle(func: Function, thresholdMs?: number): Function {
+        static debounce(func: Function, thresholdMs?: number): Function {
             var timeoutHandler: number;
 
             return (...args) => {
                 var delayed = () => {
                     timeoutHandler = null;
-                    Helpers.apply(func, args);
+                    func.apply(null, args);
                 };
 
                 if (timeoutHandler) { clearTimeout(timeoutHandler); }
-                else { Helpers.apply(func, args); }
+                else { func.apply(null, args); }
 
-                timeoutHandler = Helpers.delay(delayed, thresholdMs);
+                timeoutHandler = Helpers.delay(thresholdMs, delayed);
             };
         }
-        static wrap<T>(value: T): IWrapper<T> { return () => { return value; }; }
+        static delay(durationMs: number, func: Function): number;
+        static delay(durationMs: number, func: Function, ...funcArgs): number;
+        static delay(durationMs: number = 100, func?: Function, ...funcArgs): number {
+            if (!funcArgs) {
+                return setTimeout(func, durationMs);
+            } else {
+                return setTimeout(() => { func.apply(null, funcArgs); }, durationMs);
+            }
+        }
+        static noOp(): void { }
+        static partial(func: Function, ...funcArgs) {
+            return (...args) => {
+                return func.apply(null, funcArgs.concat(args));
+            }
+        }
+        static pipeline(...funcs) {
+            return (...funcArgs) => {
+                var pipelineFunc = new ReduceIterator(funcs, (args: IArguments, func: Function) => {
+                    return [func.apply(null, args)];
+                }, funcArgs);
+
+                var result;
+
+                while (pipelineFunc.hasNext) { result = pipelineFunc.next(); }
+
+                return result[0];
+            }
+        }
 
         static add: IReducer<number> = (n1, n2) => { return n1 + n2; };
         static subtract: IReducer<number> = (n1, n2) => { return n1 - n2; };
@@ -274,12 +262,9 @@ module ktw {
     }
 }
 
-var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-var cube: ktw.IMapper<number, number> = (n) => { return n * n * n; }
-var half: ktw.IMapper<number, number> = (n) => { return n / 2; }
-var cubeHalf: ktw.IMapper<number, number> = (n) => { return ktw.Helpers.compose(cube, half)(n); };        
-var cubeHalfSum = new ktw.MapReduceIterator<number, number, number>(numbers, cubeHalf, ktw.Helpers.add, 0);
-
-while (cubeHalfSum.hasNext) {
-    console.log(cubeHalfSum.next());
-}
+var partialed = ktw.Helpers.partial(ktw.Helpers.add, 20); // (n:number) => { return add(20, n); }
+var pipelined = ktw.Helpers.pipeline( // executes partialed, executes console.log with the result of partialed
+    partialed
+  , console.log.bind(console)
+); 
+var delayed = ktw.Helpers.delay(2000, pipelined, 80); // calls pipelined(80) after 2000ms

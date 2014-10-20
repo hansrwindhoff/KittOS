@@ -61,7 +61,7 @@
 
     export class Helpers {
         static defer<T>(success?: Function, failure?: Function, durationMs: number = 0): IDeferred<T> {
-            var result: IDeferred<T> = {
+            var result: IDeferred<T> = { // create new IDeferred<T>
                 handler: undefined,
                 status: DeferredStatus.Pending,
                 value: undefined
@@ -125,7 +125,7 @@
         }
         static repeat<T>(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<T> {
             var numExecutions: number = 0;
-            var result: IDeferred<T> = {
+            var result: IDeferred<T> = { // create new IDeferred<T>
                 handler: undefined,
                 status: DeferredStatus.Pending,
                 value: undefined

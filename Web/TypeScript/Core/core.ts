@@ -35,123 +35,50 @@
 module ktw {
     "use strict";
 
+    export enum DeferredStatus {
+        Pending = 0,
+        Completed = 1,
+        Failed = 2,
+    }
+    export interface IDeferred {
+        handler: number;
+        status: DeferredStatus;
+        value: any;
+    }
     export interface IIterator {
         hasNext: boolean;
         next(): any;
     }
+    export interface IAsyncIterator extends IIterator { nextAsync(): IDeferred; }
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
     export interface IPredicate { (...args: any[]): boolean; }
-    export interface IReducer<TResult> { (left: any, right: any): TResult; }
-    export interface IWrapper<TInput> { (): TInput; }
+    export interface IReducer<TPrevious, TNext, TResult> { (previous: TPrevious, next: TNext): TResult; }
 
-    export class Iterator implements IIterator {
-        private m_collection: Array<any>;
+    export class Iterator<T> implements IAsyncIterator {
+        private m_collection: Array<T> = [];
+        private m_errorCallback: Function;
         private m_position: number = 0;
 
-        get hasNext(): boolean {
-            return this.m_position < this.m_collection.length;
-        }
-        enumerate(): void {
-            while (this.hasNext) { this.next(); }
-        }
-        next(): any {
+        enumerateAsync(): void { ktw.Helpers.repeat(() => { this.nextAsync(); }, this.m_errorCallback, 10, this.m_collection.length); }
+        get hasNext(): boolean { return this.m_position < this.m_collection.length; }
+        next(): T {
             if (this.hasNext) {
-                var current = this.m_collection[this.m_position];
+                var current: T = this.m_collection[this.m_position];
 
                 this.m_position++;
 
                 return current;
             }
         }
+        nextAsync(): IDeferred { return Helpers.defer(() => { this.next(); }, this.m_errorCallback); }
 
-        constructor(collection: Array<any>) {
+        constructor(collection: Array<T>, errorCallback?: Function) {
             this.m_collection = collection;
-        }
-    }
-    export class FilterIterator<T> extends Iterator {
-        private m_predicate: IPredicate;
-
-        constructor(collection: Array<T>, predicate: IPredicate) {
-            super(collection);
-            this.m_predicate = predicate;
-        }
-
-        next(): T {
-            var current: T = super.next();
-
-            if (this.m_predicate(current)) {
-                return current;
-            } else {
-                while (!this.m_predicate(current) && this.hasNext) {
-                    current = super.next();
-
-                    if (this.m_predicate(current)) {
-                        return current;
-                    }
-                }
-            }
-        }
-    }
-    export class MapIterator<T, U> extends Iterator {
-        private m_mapper: IMapper<T, U>;
-
-        constructor(collection: Array<T>, mapper: IMapper<T, U>) {
-            super(collection);
-            this.m_mapper = mapper;
-        }
-
-        next(): U {
-            return this.m_mapper(super.next());
-        }
-    }
-    export class ReduceIterator<T> extends Iterator {
-        private m_previous: T;
-        private m_reducer: IReducer<T>;
-
-        constructor(collection: Array<any>, reducer: IReducer<T>, seed: any = null) {
-            super(collection);
-            this.m_reducer = reducer;
-            this.m_previous = seed;
-        }
-
-        next(): T {
-            var current: T = this.m_reducer(this.m_previous, super.next());
-
-            this.m_previous = current;
-
-            return current;
+            this.m_errorCallback = errorCallback;
         }
     }
 
     export class Helpers {
-        static generateUuid() {
-            // http://stackoverflow.com/a/8809472/1186165
-
-            var ms: number = new Date().getTime();
-
-            var uuid: string = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r: number = (ms + Math.random() * 16) % 16 | 0;
-                ms = Math.floor(ms / 16);
-                return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-            });
-
-            return uuid;
-        }
-        static hashFnv1a(str: string, offset: number = 2166136261): number {
-            // https://gist.github.com/vaiorabbit/5657561
-            // http://isthe.com/chongo/tech/comp/fnv/
-
-            var hash = offset;
-            var i: number, l: number;
-
-            for (i = 0, l = str.length; i < l; i++) {
-                hash ^= str.charCodeAt(i);
-                hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-            }
-
-            return hash >>> 0;
-        }
-
         static isArray(obj: Object): boolean {
             return Helpers.is(JsTypes.jsArray, obj);
         }
@@ -160,6 +87,7 @@ module ktw {
         }
         static isNumber(str: string): boolean;
         static isNumber(num: number): boolean;
+        static isNumber(obj: Object): boolean;
         static isNumber(obj: any): boolean {
             if (Helpers.is(JsTypes.jsNumber, obj)) { return true; } // num overload
             if (Helpers.is(JsTypes.jsString, obj)) { return !isNaN(obj); } // str overload
@@ -182,57 +110,87 @@ module ktw {
             return Helpers.is(JsTypes.jsUndefined, obj);
         }
 
-        static debounce(func: Function, thresholdMs?: number): Function {
-            var timeoutHandler: number;
-
-            return (...args) => {
-                var delayed = () => {
-                    timeoutHandler = null;
-                    func.apply(null, args);
-                };
-
-                if (timeoutHandler) { clearTimeout(timeoutHandler); }
-                else { func.apply(null, args); }
-
-                timeoutHandler = Helpers.delay(thresholdMs, delayed);
+        static defer(success?: Function, failure?: Function, durationMs: number = 0): IDeferred {
+            var result: IDeferred = {
+                handler: undefined,
+                status: DeferredStatus.Pending,
+                value: undefined
             };
+
+            result.handler = setTimeout(() => { // set handler
+                try {
+                    result.value = (success || Helpers.noOp).apply(null, null); // fulfill
+                    result.status = DeferredStatus.Completed; // mark as completed
+                } catch (e) {
+                    result.value = (failure || Helpers.noOp).apply(null, [e]); // reject
+                    result.status = DeferredStatus.Failed; // mark as failed
+                } finally {
+                    clearTimeout(result.handler); // completely unnecessary... but it feels good?
+                }
+            }, durationMs);
+
+            return result;
         }
-        static delay(durationMs: number, func: Function): number;
-        static delay(durationMs: number, func: Function, ...funcArgs): number;
-        static delay(durationMs: number = 100, func?: Function, ...funcArgs): number {
-            if (!funcArgs) {
-                return setTimeout(func, durationMs);
-            } else {
-                return setTimeout(() => { func.apply(null, funcArgs); }, durationMs);
+        static limit(func: Function, maxExecutions: number = 1) {
+            var numExecutions: number = 0;
+
+            return (...args: any[]) => {
+                if (numExecutions < maxExecutions) {
+                    numExecutions++;
+                    return func.apply(null, args);
+                }
             }
         }
         static noOp(): void { }
-        static partial(func: Function, ...funcArgs) {
-            return (...args) => {
+        static partial(func: Function, ...funcArgs: any[]) {
+            return (...args: any[]) => {
                 return func.apply(null, funcArgs.concat(args));
             }
         }
-        static pipeline(...funcs) {
-            return (...funcArgs) => {
-                var pipelineFunc = new ReduceIterator(funcs, (args: IArguments, func: Function) => {
+        static pipeline(...funcs: any[]): Function {
+            return (...funcArgs: any[]) => {
+                var applyArgs: IReducer<IArguments, Function, Array<Function>> = (args: IArguments, func: Function) => {
                     return [func.apply(null, args)];
-                }, funcArgs);
+                };
 
-                var result;
-
-                while (pipelineFunc.hasNext) { result = pipelineFunc.next(); }
-
-                return result[0];
+                return funcs.reduce(applyArgs, funcArgs)[0];
             }
         }
+        static repeat(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred {
+            var numExecutions: number = 0;
+            var result: IDeferred = {
+                handler: undefined,
+                status: DeferredStatus.Pending,
+                value: undefined
+            };
 
-        static add: IReducer<number> = (n1, n2) => { return n1 + n2; };
-        static subtract: IReducer<number> = (n1, n2) => { return n1 - n2; };
-        static multiply: IReducer<number> = (n1, n2) => { return n1 * n2; };
-        static divide: IReducer<number> = (n1, n2) => { return n1 / n2; };
-        static remainder: IReducer<number> = (n1, n2) => { return n1 % n2; };
-        static min: IReducer<number> = (n1, n2) => { return Math.min(n1, n2); };
-        static max: IReducer<number> = (n1, n2) => { return Math.max(n1, n2); };
+            result.handler = setInterval(() => {
+                if (maxExecutions && numExecutions === maxExecutions) {
+                    clearInterval(result.handler);
+                } else {
+                    try {
+                        numExecutions++;
+                        result.value = (success || Helpers.noOp).apply(null, null); // fulfill
+                        result.status = DeferredStatus.Completed; // mark as completed
+                    } catch (e) {
+                        clearInterval(result.handler); // clear interval handler
+                        result.value = (failure || Helpers.noOp).apply(null, [e]); // reject
+                        result.status = DeferredStatus.Failed; // mark as failed
+                    }
+                }
+            }, intervalMs || 10);
+
+            return result;
+        }
+        static wrap(obj: Object): Function { return () => { return obj; } }
+
+        static add: IReducer<number, number, number> = (n1, n2) => { return n1 + n2; };
+        static subtract: IReducer<number, number, number> = (n1, n2) => { return n1 - n2; };
+        static multiply: IReducer<number, number, number> = (n1, n2) => { return n1 * n2; };
+        static divide: IReducer<number, number, number> = (n1, n2) => { return n1 / n2; };
+        static remainder: IReducer<number, number, number> = (n1, n2) => { return n1 % n2; };
+        static min: IReducer<number, number, number> = (n1, n2) => { return Math.min(n1, n2); };
+        static max: IReducer<number, number, number> = (n1, n2) => { return Math.max(n1, n2); };
         static lessThan: IPredicate = (l: any, r: any) => { return l < r; };
         static greaterThan: IPredicate = (l: any, r: any) => { return l > r; };
         static equalTo: IPredicate = (l: any, r: any) => { return l === r; };
@@ -244,9 +202,7 @@ module ktw {
 
             return Object.prototype.toString.call(obj).slice(8, -1);
         }
-        private static is(typeName: string, obj: Object): boolean {
-            return Helpers.getClass(obj) === typeName;
-        }
+        private static is(typeName: string, obj: Object): boolean { return Helpers.getClass(obj) === typeName; }
     }
     export class JsTypes {
         static jsArray = "Array";
@@ -262,9 +218,6 @@ module ktw {
     }
 }
 
-var partialed = ktw.Helpers.partial(ktw.Helpers.add, 20); // (n:number) => { return add(20, n); }
-var pipelined = ktw.Helpers.pipeline( // executes partialed, executes console.log with the result of partialed
-    partialed
-  , console.log.bind(console)
-); 
-var delayed = ktw.Helpers.delay(2000, pipelined, 80); // calls pipelined(80) after 2000ms
+var nums = [1, 2, 3, 4, 5, 6, 7];
+var it = new ktw.Iterator(nums, (e) => { throw (e); });
+it.enumerateAsync();

@@ -151,31 +151,31 @@
         }
         static wrap<T>(obj: T): Function { return (): T => { return obj; } }
 
-        static isArray(obj: Object): boolean { return Helpers.is(JsTypes.jsArray, obj); }
-        static isFunction(obj: Object): boolean { return Helpers.is(JsTypes.jsFunction, obj); }
+        static isArray<T>(obj: T): boolean { return Helpers.is(JsTypes.jsArray, obj); }
+        static isFunction<T>(obj: T): boolean { return Helpers.is(JsTypes.jsFunction, obj); }
         static isNumber(str: string): boolean;
         static isNumber(num: number): boolean;
-        static isNumber(obj: Object): boolean;
+        static isNumber<T>(obj: T): boolean;
         static isNumber(obj: any): boolean {
             if (Helpers.is(JsTypes.jsNumber, obj)) { return true; } // num overload
             if (Helpers.is(JsTypes.jsString, obj)) { return !isNaN(obj); } // str overload
 
             return false;
         }
-        static isNull(obj: Object): boolean { return Helpers.is(JsTypes.jsNull, obj); }
-        static isNullOrUndefined(obj: Object): boolean { return Helpers.isNull(obj) || Helpers.isUndefined(obj); }
-        static isObject(obj: Object): boolean { return Helpers.is(JsTypes.jsObject, obj); }
-        static isString(obj: Object): boolean { return Helpers.is(JsTypes.jsString, obj); }
-        static isUndefined(obj: Object): boolean { return Helpers.is(JsTypes.jsUndefined, obj); }
+        static isNull<T>(obj: T): boolean { return Helpers.is(JsTypes.jsNull, obj); }
+        static isNullOrUndefined<T>(obj: T): boolean { return Helpers.isNull(obj) || Helpers.isUndefined(obj); }
+        static isObject<T>(obj: T): boolean { return Helpers.is(JsTypes.jsObject, obj); }
+        static isString<T>(obj: T): boolean { return Helpers.is(JsTypes.jsString, obj); }
+        static isUndefined<T>(obj: T): boolean { return Helpers.is(JsTypes.jsUndefined, obj); }
 
-        private static getClass(obj: Object): string {
+        private static getClass<T>(obj: T): string {
             // http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
             // http://bonsaiden.github.io/JavaScript-Garden/#types.typeof
             // Caution: returns "Object" for all user-defined types
 
             return Object.prototype.toString.call(obj).slice(8, -1);
         }
-        private static is(typeName: string, obj: Object): boolean { return Helpers.getClass(obj) === typeName; }
+        private static is<T>(typeName: string, obj: T): boolean { return Helpers.getClass(obj) === typeName; }
     }
     export class JsTypes {
         static jsArray = "Array";

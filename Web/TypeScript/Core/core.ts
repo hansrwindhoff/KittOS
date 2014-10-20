@@ -62,7 +62,11 @@ module ktw {
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(): void { ktw.Helpers.repeat(() => { this.next(); }, this.m_errorCallback, 1, this.m_collection.length); }
+        enumerateAsync(throttleMs: number = 10): void {
+            ktw.Helpers.repeat(() => {
+                this.next();
+            }, this.m_errorCallback, throttleMs, this.m_collection.length);
+        }
         next(): T {
             if (this.hasNext) {
                 var current: T = this.m_collection[this.m_position];
@@ -219,8 +223,3 @@ module ktw {
         static jsUndefined = "Undefined";
     }
 }
-
-var nums = [1, 2, 3, 4, 5, 6, 7, 8 , 9, 10];
-var it = new ktw.Iterator(nums);
-it.enumerateAsync();
-console.log("Hi");

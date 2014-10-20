@@ -164,13 +164,13 @@ module ktw {
             };
 
             result.handler = setInterval(() => {
-                if (maxExecutions && numExecutions === maxExecutions) {
-                    clearInterval(result.handler);
+                if (maxExecutions && numExecutions === maxExecutions) { // max executions reached
+                    clearInterval(result.handler); // clear interval handler
+                    result.status = DeferredStatus.Completed; // mark as completed
                 } else {
                     try {
                         numExecutions++;
                         result.value = (success || Helpers.noOp).apply(null, null); // fulfill
-                        result.status = DeferredStatus.Completed; // mark as completed
                     } catch (e) {
                         clearInterval(result.handler); // clear interval handler
                         result.value = (failure || Helpers.noOp).apply(null, [e]); // reject

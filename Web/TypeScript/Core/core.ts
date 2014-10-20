@@ -62,16 +62,17 @@ module ktw {
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(intervalMs: number = 25): IDeferred {
+        enumerateAsync(): IDeferred {
+            var breakIntervalMs: number = 15;
             var loop: IDeferred = Helpers.repeat(() => {
                 var start: number = +new Date();
-                while (this.hasNext && (+new Date() - start < intervalMs)) { this.next(); }
+                while (this.hasNext && ((+new Date() - start) < breakIntervalMs)) { this.next(); }
 
                 if (!this.hasNext) {
                     clearInterval(loop.handler);
                     loop.status = DeferredStatus.Completed;
                 }
-            }, this.m_errorCallback, intervalMs);
+            }, this.m_errorCallback, breakIntervalMs);
 
             return loop;
         }
@@ -215,7 +216,3 @@ module ktw {
         static jsUndefined = "Undefined";
     }
 }
-
-var t = new ktw.Iterator(new Array(9000000));
-var h = t.enumerateAsync();
-console.log("Start: " + new Date(Date.now()).toTimeString());

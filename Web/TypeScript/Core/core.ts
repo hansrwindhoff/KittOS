@@ -62,19 +62,18 @@ module ktw {
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(): void {
-            var processItems = () => {
+        enumerateAsync(intervalMs: number = 25): IDeferred {
+            var loop: IDeferred = Helpers.repeat(() => {
                 var start: number = +new Date();
-                while (this.hasNext && (+new Date() - start < 50)) { this.next(); };
+                while (this.hasNext && (+new Date() - start < intervalMs)) { this.next(); }
 
-                if (this.hasNext) {
-                    Helpers.defer(processItems, this.m_errorCallback, 25);
-                } else {
-                    clearTimeout(processItems);
+                if (!this.hasNext) {
+                    clearInterval(loop.handler);
+                    loop.status = DeferredStatus.Completed;
                 }
-            }
+            }, this.m_errorCallback, intervalMs);
 
-            Helpers.defer(processItems, this.m_errorCallback, 25);
+            return loop;
         }
         next(): T {
             if (this.hasNext) {
@@ -125,8 +124,6 @@ module ktw {
                 } catch (e) {
                     result.value = (failure || Helpers.noOp).apply(null, [e]); // reject
                     result.status = DeferredStatus.Failed; // mark as failed
-                } finally {
-                    clearTimeout(result.handler); // completely unnecessary... but it feels good?
                 }
             }, durationMs);
 
@@ -220,5 +217,5 @@ module ktw {
 }
 
 var t = new ktw.Iterator(new Array(9000000));
-t.enumerateAsync();
+var h = t.enumerateAsync();
 console.log("Start: " + new Date(Date.now()).toTimeString());

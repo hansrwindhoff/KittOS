@@ -62,10 +62,19 @@ module ktw {
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(throttleMs: number = 10): void {
-            ktw.Helpers.repeat(() => {
-                this.next();
-            }, this.m_errorCallback, throttleMs, this.m_collection.length);
+        enumerateAsync(): void {
+            var processItems = () => {
+                var start: number = +new Date();
+                while (this.hasNext && (+new Date() - start < 50)) { this.next(); };
+
+                if (this.hasNext) {
+                    Helpers.defer(processItems, this.m_errorCallback, 25);
+                } else {
+                    clearTimeout(processItems);
+                }
+            }
+
+            Helpers.defer(processItems, this.m_errorCallback, 25);
         }
         next(): T {
             if (this.hasNext) {
@@ -85,12 +94,8 @@ module ktw {
     }
 
     export class Helpers {
-        static isArray(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsArray, obj);
-        }
-        static isFunction(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsFunction, obj);
-        }
+        static isArray(obj: Object): boolean { return Helpers.is(JsTypes.jsArray, obj); }
+        static isFunction(obj: Object): boolean { return Helpers.is(JsTypes.jsFunction, obj); }
         static isNumber(str: string): boolean;
         static isNumber(num: number): boolean;
         static isNumber(obj: Object): boolean;
@@ -100,21 +105,11 @@ module ktw {
 
             return false;
         }
-        static isNull(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsNull, obj);
-        }
-        static isNullOrUndefined(obj: Object): boolean {
-            return Helpers.isNull(obj) || Helpers.isUndefined(obj);
-        }
-        static isObject(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsObject, obj);
-        }
-        static isString(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsString, obj);
-        }
-        static isUndefined(obj: Object): boolean {
-            return Helpers.is(JsTypes.jsUndefined, obj);
-        }
+        static isNull(obj: Object): boolean { return Helpers.is(JsTypes.jsNull, obj); }
+        static isNullOrUndefined(obj: Object): boolean { return Helpers.isNull(obj) || Helpers.isUndefined(obj); }
+        static isObject(obj: Object): boolean { return Helpers.is(JsTypes.jsObject, obj); }
+        static isString(obj: Object): boolean { return Helpers.is(JsTypes.jsString, obj); }
+        static isUndefined(obj: Object): boolean { return Helpers.is(JsTypes.jsUndefined, obj); }
 
         static defer(success?: Function, failure?: Function, durationMs: number = 0): IDeferred {
             var result: IDeferred = {
@@ -223,3 +218,7 @@ module ktw {
         static jsUndefined = "Undefined";
     }
 }
+
+var t = new ktw.Iterator(new Array(9000000));
+t.enumerateAsync();
+console.log("Start: " + new Date(Date.now()).toTimeString());

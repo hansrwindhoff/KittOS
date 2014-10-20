@@ -131,21 +131,22 @@
                 value: undefined
             };
 
-            result.handler = setInterval(() => {
+            result.handler = (function loop() {
                 if ((numExecutions < maxExecutions) || !maxExecutions) {
                     try {
                         numExecutions++;
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
+                        result.handler = setTimeout(loop, intervalMs); // spawn new handler
                     } catch (e) {
-                        clearInterval(result.handler); // clear interval handler
                         result.value = Helpers.nullApply((failure || Helpers.noOp)); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
                     }
                 } else if (numExecutions === maxExecutions) { // max executions reached
-                    clearInterval(result.handler); // clear interval handler
                     result.status = DeferredStatus.Completed; // mark as completed
                 }
-            }, intervalMs || 15);
+
+                return result.handler;
+            })();
 
             return result;
         }

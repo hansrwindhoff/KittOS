@@ -13,6 +13,7 @@
     }
     export interface IIterator<T> {
         hasNext: boolean;
+        length: number;
         next(): T;
     }
     export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
@@ -26,10 +27,13 @@
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
+        get length(): number { return this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
         enumerateAsync(failure?: Function, breatherMs?: number): IDeferred<any> {
-            return Helpers.repeat(() => { return this.next(); }, failure, null, this.m_collection.length);
+            return Helpers.repeat(() => {
+                return this.next();
+            }, failure, null, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -40,7 +44,11 @@
                 return current;
             }
         }
-        nextAsync(): IDeferred<T> { return Helpers.defer<T>(() => { return this.next(); }, this.m_failureCallback); }
+        nextAsync(): IDeferred<T> {
+            return Helpers.defer<T>(() => {
+                return this.next();
+            }, this.m_failureCallback);
+        }
 
         constructor(collection: Array<T>, failureCallback?: Function) {
             this.m_collection = collection;
@@ -91,12 +99,20 @@
                 }
             }
         }
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Iterator<TResult> {
-            var mapped: Array<TResult> = [];
+        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Array<TResult>;
+        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, async?: boolean, failure?: Function): IDeferred<Array<TResult>>;
+        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, async?: boolean, failure?: Function): any {
+            if (!async) {
+                var mapped: Array<TResult> = [];
 
-            while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
+                while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
 
-            return new Iterator(mapped);
+                return mapped;
+            } else {
+                return Helpers.repeat<TResult>(() => {
+                    return Helpers.nullApply(mapper, iterator.next());
+                }, failure, null, iterator.length);
+            }
         }
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }
@@ -112,9 +128,9 @@
 
             return accumulator;
         }
-        static repeat(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<any> {
+        static repeat<T>(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<Array<T>> {
             var numExecutions: number = 0;
-            var result: IDeferred<any> = { // create new IDeferred<T>
+            var result: IDeferred<Array<T>> = { // create new IDeferred<Arr>
                 handler: undefined,
                 status: DeferredStatus.Pending,
                 value: []
@@ -187,3 +203,14 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var nums = [1, 2, 3, 4, 5];
+var mapped = kcl.Helpers.map((n: number) => { return n * n; }, new kcl.Iterator(nums), false);
+var aMapped = kcl.Helpers.map((n: number) => { return n * n * n; }, new kcl.Iterator(nums), true);
+
+console.log(mapped); // prints [1, 4, 9, 16, 25]
+console.log(aMapped); // prints imcomplete deferred with empty array
+
+setTimeout(() => {
+    console.log(aMapped); // prints deferred with array [1, 8, 27, 64, 125]
+}, 1000);

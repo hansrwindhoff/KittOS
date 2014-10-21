@@ -22,25 +22,14 @@
 
     export class Iterator<T> implements IAsyncIterator<T> {
         private m_collection: Array<T> = [];
-        private m_errorCallback: Function;
+        private m_failureCallback: Function;
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(): IDeferred<any> {
-            var breakIntervalMs: number = 15;
-            var loop: IDeferred<any> = Helpers.repeat(() => {
-                var start: number = +new Date();
-                while (this.hasNext && ((+new Date() - start) < breakIntervalMs)) { this.next(); }
-
-                if (!this.hasNext) {
-                    clearInterval(loop.handler);
-                    loop.status = DeferredStatus.Completed;
-                }
-            }, this.m_errorCallback, breakIntervalMs);
-
-            return loop;
+        enumerateAsync(failure?: Function, breatherMs?: number): IDeferred<any> {
+            return Helpers.repeat(() => { return this.next(); }, failure, null, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -51,11 +40,11 @@
                 return current;
             }
         }
-        nextAsync(): IDeferred<T> { return Helpers.defer<T>(() => { this.next(); }, this.m_errorCallback); }
+        nextAsync(): IDeferred<T> { return Helpers.defer<T>(() => { return this.next(); }, this.m_failureCallback); }
 
-        constructor(collection: Array<T>, errorCallback?: Function) {
+        constructor(collection: Array<T>, failureCallback?: Function) {
             this.m_collection = collection;
-            this.m_errorCallback = errorCallback;
+            this.m_failureCallback = failureCallback;
         }
     }
 
@@ -79,7 +68,7 @@
 
             return result;
         }
-        static filter<T>(predicate: IPredicate, iterator: IIterator<T>): IIterator<T> {
+        static filter<T>(predicate: IPredicate, iterator: IIterator<T>): Iterator<T> {
             var filtered: Array<T> = [];
 
             while (iterator.hasNext) {
@@ -102,7 +91,7 @@
                 }
             }
         }
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): IIterator<TResult> {
+        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Iterator<TResult> {
             var mapped: Array<TResult> = [];
 
             while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
@@ -123,30 +112,37 @@
 
             return accumulator;
         }
-        static repeat<T>(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<T> {
+        static repeat(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<any> {
             var numExecutions: number = 0;
-            var result: IDeferred<T> = { // create new IDeferred<T>
+            var result: IDeferred<any> = { // create new IDeferred<T>
                 handler: undefined,
                 status: DeferredStatus.Pending,
-                value: undefined
+                value: []
             };
 
-            result.handler = (function loop() {
-                if ((numExecutions < maxExecutions) || !maxExecutions) {
+            intervalMs = intervalMs || 15; // default intervalMs to 15ms
+
+            var worker = () => {
+                var start: number = Date.now();
+                result.handler = setTimeout(worker, intervalMs); // prepare another worker
+
+                while ((Date.now() - start < intervalMs) && numExecutions < maxExecutions) {
                     try {
                         numExecutions++;
-                        result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
-                        result.handler = setTimeout(loop, intervalMs); // spawn new handler
+                        result.value.push(Helpers.nullApply((success || Helpers.noOp))); // fulfill
                     } catch (e) {
-                        result.value = Helpers.nullApply((failure || Helpers.noOp)); // reject
+                        result.value.push(Helpers.nullApply((failure || Helpers.noOp))); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
                     }
-                } else if (numExecutions === maxExecutions) { // max executions reached
-                    result.status = DeferredStatus.Completed; // mark as completed
                 }
 
-                return result.handler;
-            })();
+                if (numExecutions === maxExecutions) {
+                    clearTimeout(result.handler); // stop loop
+                    result.status = DeferredStatus.Completed; // mark as complete
+                }
+            }
+
+            result.handler = setTimeout(worker, 0); // start loop
 
             return result;
         }

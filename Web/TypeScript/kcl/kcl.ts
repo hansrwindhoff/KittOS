@@ -32,9 +32,7 @@
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
         enumerateAsync(failure?: Function, delayMs?: number): IDeferred<Array<T>> {
-            return Helpers.repeat<T>(() => {
-                return this.next();
-            }, failure, delayMs, this.m_collection.length);
+            return Helpers.repeat<T>(() => { return this.next(); }, failure, delayMs, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -46,9 +44,7 @@
             }
         }
         nextAsync(failure?: Function): IDeferred<T> {
-            return Helpers.defer<T>(() => {
-                return this.next();
-            }, failure);
+            return Helpers.defer<T>(() => { return this.next(); }, failure);
         }
 
         constructor(collection: Array<T> = []) { this.m_collection = collection; }
@@ -105,9 +101,7 @@
             return mapped;
         }
         static mapAsync<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, failure?: Function): IDeferred<Array<TResult>> {
-            return Helpers.repeat<TResult>(() => {
-                return Helpers.nullApply(mapper, iterator.next());
-            }, failure, null, iterator.length);
+            return Helpers.repeat<TResult>(() => { return Helpers.nullApply(mapper, iterator.next()); }, failure, null, iterator.length);
         }
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }

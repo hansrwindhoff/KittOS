@@ -14,6 +14,7 @@
     export interface IIterator<T> {
         hasNext: boolean;
         length: number;
+        position: number;
         next(): T;
     }
     export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
@@ -22,15 +23,16 @@
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
 
     export class Iterator<T> implements IAsyncIterator<T> {
-        private m_collection: Array<T> = [];
+        private m_collection: Array<T>;
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
         get length(): number { return this.m_collection.length; }
+        get position(): number { return this.m_position; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<any> {
-            return Helpers.repeat(() => {
+        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<Array<T>> {
+            return Helpers.repeat<T>(() => {
                 return this.next();
             }, failure, delayMs, this.m_collection.length);
         }
@@ -49,7 +51,7 @@
             }, failure);
         }
 
-        constructor(collection: Array<T>) { this.m_collection = collection; }
+        constructor(collection: Array<T> = []) { this.m_collection = collection; }
     }
 
     export class Helpers {
@@ -60,12 +62,12 @@
                 value: undefined
             };
 
-            result.handler = setTimeout(() => { // delay function and assign handler
+            result.handler = setTimeout(() => { // spawn worker and assign handler
                 try {
                     result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
                     result.status = DeferredStatus.Completed; // mark as completed
                 } catch (e) {
-                    result.value = Helpers.nullApply((failure || Helpers.noOp)); // reject
+                    result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
                     result.status = DeferredStatus.Failed; // mark as failed
                 }
             }, delayMs);
@@ -102,7 +104,7 @@
 
             return mapped;
         }
-        static mapAsync<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, failure?: Function): any {
+        static mapAsync<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, failure?: Function): IDeferred<Array<TResult>> {
             return Helpers.repeat<TResult>(() => {
                 return Helpers.nullApply(mapper, iterator.next());
             }, failure, null, iterator.length);
@@ -139,7 +141,7 @@
                         numExecutions++;
                         result.value.push(Helpers.nullApply((success || Helpers.noOp))); // fulfill
                     } catch (e) {
-                        result.value.push(Helpers.nullApply((failure || Helpers.noOp))); // reject
+                        result.value.push(Helpers.nullApply((failure || Helpers.noOp), [e])); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
                     }
                 }

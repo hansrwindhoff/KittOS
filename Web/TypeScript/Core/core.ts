@@ -99,21 +99,19 @@
                 }
             }
         }
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Array<TResult>;
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, async?: boolean, failure?: Function): IDeferred<Array<TResult>>;
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, async?: boolean, failure?: Function): any {
-            if (!async) {
-                var mapped: Array<TResult> = [];
+        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Array<TResult> {
+            var mapped: Array<TResult> = [];
 
-                while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
+            while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
 
-                return mapped;
-            } else {
-                return Helpers.repeat<TResult>(() => {
-                    return Helpers.nullApply(mapper, iterator.next());
-                }, failure, null, iterator.length);
-            }
+            return mapped;
         }
+        static mapAsync<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, failure?: Function): any {
+            return Helpers.repeat<TResult>(() => {
+                return Helpers.nullApply(mapper, iterator.next());
+            }, failure, null, iterator.length);
+        }
+
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }
         static partial(func: Function, ...args: any[]) {
@@ -142,7 +140,7 @@
                 var start: number = Date.now();
                 result.handler = setTimeout(worker, intervalMs); // prepare another worker
 
-                while ((Date.now() - start < intervalMs) && numExecutions < maxExecutions) {
+                do {
                     try {
                         numExecutions++;
                         result.value.push(Helpers.nullApply((success || Helpers.noOp))); // fulfill
@@ -151,6 +149,7 @@
                         result.status = DeferredStatus.Failed; // mark as failed
                     }
                 }
+                while ((Date.now() - start < intervalMs) && numExecutions < maxExecutions);
 
                 if (numExecutions === maxExecutions) {
                     clearTimeout(result.handler); // stop loop
@@ -205,8 +204,8 @@
 }
 
 var nums = [1, 2, 3, 4, 5];
-var mapped = kcl.Helpers.map((n: number) => { return n * n; }, new kcl.Iterator(nums), false);
-var aMapped = kcl.Helpers.map((n: number) => { return n * n * n; }, new kcl.Iterator(nums), true);
+var mapped = kcl.Helpers.map((n: number) => { return n * n; }, new kcl.Iterator(nums));
+var aMapped = kcl.Helpers.mapAsync((n: number) => { return n * n * n; }, new kcl.Iterator(nums));
 
 console.log(mapped); // prints [1, 4, 9, 16, 25]
 console.log(aMapped); // prints imcomplete deferred with empty array

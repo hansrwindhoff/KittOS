@@ -33,7 +33,7 @@
         enumerateAsync(failure?: Function, breatherMs?: number): IDeferred<any> {
             return Helpers.repeat(() => {
                 return this.next();
-            }, failure, -1, this.m_collection.length);
+            }, failure, null, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -58,13 +58,13 @@
 
     export class Helpers {
         static defer<T>(success?: Function, failure?: Function, durationMs: number = 0): IDeferred<T> {
-            var result: IDeferred<T> = { // create new IDeferred<T>
+            var result: IDeferred<T> = {
                 handler: undefined,
                 status: DeferredStatus.Pending,
                 value: undefined
             };
 
-            result.handler = setTimeout(() => { // set handler
+            result.handler = setTimeout(() => { // delay function and assign handler
                 try {
                     result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
                     result.status = DeferredStatus.Completed; // mark as completed
@@ -126,17 +126,17 @@
             return accumulator;
         }
         static repeat<T>(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<Array<T>> {
-            delayMs = ((kcl.Helpers.isNumber(delayMs) && delayMs > 4) ? delayMs : 4) // default delayMs to 4ms if not number or delayMs < 4 (see: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0)
+            delayMs = ((kcl.Helpers.isNumber(delayMs) && delayMs > 4) ? delayMs : 4) // set delayMs to 4 if not number or < 4 (see: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0)
             var numExecutions: number = 0;
-            var result: IDeferred<Array<T>> = { // create new IDeferred<Arr>
-                handler: undefined,
+            var result: IDeferred<Array<T>> = {
+                handler: undefined, // handler of the next looper
                 status: DeferredStatus.Pending,
                 value: []
             };
 
-            var worker = () => {
+            var looper = () => {
                 var start: number = Date.now();
-                result.handler = setTimeout(worker, delayMs); // prepare another worker
+                result.handler = setTimeout(looper, delayMs); // spawn next looper
 
                 do {
                     try {
@@ -150,12 +150,12 @@
                 while (((Date.now() - start) < delayMs) && numExecutions < maxExecutions);
 
                 if (numExecutions === maxExecutions) {
-                    clearTimeout(result.handler); // stop loop
+                    clearTimeout(result.handler); // cancel next looper
                     result.status = DeferredStatus.Completed; // mark as complete
                 }
             }
 
-            result.handler = setTimeout(worker, 4); // start loop
+            result.handler = setTimeout(looper, 4); // start looping
 
             return result;
         }

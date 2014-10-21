@@ -23,17 +23,16 @@
 
     export class Iterator<T> implements IAsyncIterator<T> {
         private m_collection: Array<T> = [];
-        private m_failureCallback: Function;
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
         get length(): number { return this.m_collection.length; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(failure?: Function, breatherMs?: number): IDeferred<any> {
+        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<any> {
             return Helpers.repeat(() => {
                 return this.next();
-            }, failure, null, this.m_collection.length);
+            }, failure, delayMs, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -44,20 +43,17 @@
                 return current;
             }
         }
-        nextAsync(): IDeferred<T> {
+        nextAsync(failure?: Function): IDeferred<T> {
             return Helpers.defer<T>(() => {
                 return this.next();
-            }, this.m_failureCallback);
+            }, failure);
         }
 
-        constructor(collection: Array<T>, failureCallback?: Function) {
-            this.m_collection = collection;
-            this.m_failureCallback = failureCallback;
-        }
+        constructor(collection: Array<T>) { this.m_collection = collection; }
     }
 
     export class Helpers {
-        static defer<T>(success?: Function, failure?: Function, durationMs: number = 0): IDeferred<T> {
+        static defer<T>(success?: Function, failure?: Function, delayMs: number = 0): IDeferred<T> {
             var result: IDeferred<T> = {
                 handler: undefined,
                 status: DeferredStatus.Pending,
@@ -72,7 +68,7 @@
                     result.value = Helpers.nullApply((failure || Helpers.noOp)); // reject
                     result.status = DeferredStatus.Failed; // mark as failed
                 }
-            }, durationMs);
+            }, delayMs);
 
             return result;
         }

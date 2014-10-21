@@ -33,7 +33,7 @@
         enumerateAsync(failure?: Function, breatherMs?: number): IDeferred<any> {
             return Helpers.repeat(() => {
                 return this.next();
-            }, failure, null, this.m_collection.length);
+            }, failure, -1, this.m_collection.length);
         }
         next(): T {
             if (this.hasNext) {
@@ -89,7 +89,7 @@
 
             return new Iterator(filtered);
         }
-        static limit(func: Function, maxExecutions: number = 1) {
+        static limit(func: Function, maxExecutions: number = 1): Function {
             var numExecutions: number = 0;
 
             return (...args: any[]) => {
@@ -111,10 +111,9 @@
                 return Helpers.nullApply(mapper, iterator.next());
             }, failure, null, iterator.length);
         }
-
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }
-        static partial(func: Function, ...args: any[]) {
+        static partial(func: Function, ...args: any[]): Function {
             return (...calledArgs: any[]) => {
                 return Helpers.nullApply(func, args.concat(calledArgs));
             }
@@ -126,7 +125,8 @@
 
             return accumulator;
         }
-        static repeat<T>(success?: Function, failure?: Function, intervalMs?: number, maxExecutions?: number): IDeferred<Array<T>> {
+        static repeat<T>(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<Array<T>> {
+            delayMs = ((kcl.Helpers.isNumber(delayMs) && delayMs > 4) ? delayMs : 4) // default delayMs to 4ms if not number or delayMs < 4 (see: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0)
             var numExecutions: number = 0;
             var result: IDeferred<Array<T>> = { // create new IDeferred<Arr>
                 handler: undefined,
@@ -134,11 +134,9 @@
                 value: []
             };
 
-            intervalMs = intervalMs || 15; // default intervalMs to 15ms
-
             var worker = () => {
                 var start: number = Date.now();
-                result.handler = setTimeout(worker, intervalMs); // prepare another worker
+                result.handler = setTimeout(worker, delayMs); // prepare another worker
 
                 do {
                     try {
@@ -149,7 +147,7 @@
                         result.status = DeferredStatus.Failed; // mark as failed
                     }
                 }
-                while ((Date.now() - start < intervalMs) && numExecutions < maxExecutions);
+                while (((Date.now() - start) < delayMs) && numExecutions < maxExecutions);
 
                 if (numExecutions === maxExecutions) {
                     clearTimeout(result.handler); // stop loop
@@ -157,7 +155,7 @@
                 }
             }
 
-            result.handler = setTimeout(worker, 0); // start loop
+            result.handler = setTimeout(worker, 4); // start loop
 
             return result;
         }
@@ -202,14 +200,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var nums = [1, 2, 3, 4, 5];
-var mapped = kcl.Helpers.map((n: number) => { return n * n; }, new kcl.Iterator(nums));
-var aMapped = kcl.Helpers.mapAsync((n: number) => { return n * n * n; }, new kcl.Iterator(nums));
-
-console.log(mapped); // prints [1, 4, 9, 16, 25]
-console.log(aMapped); // prints imcomplete deferred with empty array
-
-setTimeout(() => {
-    console.log(aMapped); // prints deferred with array [1, 8, 27, 64, 125]
-}, 1000);

@@ -45,18 +45,19 @@
     export class Helpers {
         static defer<T>(success?: Function, failure?: Function, delayMs: number = 0): IDeferred<T> {
             var result = {
-                handler: undefined,
                 status: DeferredStatus.Pending,
                 value: undefined
             };
 
-            result.handler = setTimeout(() => { // spawn worker and assign handler
-                try {
-                    result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
-                    result.status = DeferredStatus.Completed; // mark as completed
-                } catch (e) {
-                    result.value = Helpers.nullApply((failure || Helpers.noOp), e); // reject
-                    result.status = DeferredStatus.Failed; // mark as failed
+            setTimeout(() => { // start delay
+                if (result.status === DeferredStatus.Pending) { // defer wasn't cancelled
+                    try {
+                        result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
+                        result.status = DeferredStatus.Completed; // fulfill
+                    } catch (e) {
+                        result.value = Helpers.nullApply((failure || Helpers.noOp), e); // call failure or no-op
+                        result.status = DeferredStatus.Failed; // reject
+                    }
                 }
             }, delayMs);
 

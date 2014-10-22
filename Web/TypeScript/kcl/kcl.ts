@@ -13,8 +13,6 @@
     }
     export interface IIterator<T> {
         hasNext: boolean;
-        length: number;
-        position: number;
         next(): T;
     }
     export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
@@ -22,23 +20,13 @@
     export interface IObservable<T> { value: T; }
     export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
-    export interface IStream<T> extends IObservable<T> {
-        start(): any;
-        stop(): any;
-    }
 
     export class Iterator<T> implements IAsyncIterator<T> {
         private m_collection: Array<T>;
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
-        get length(): number { return this.m_collection.length; }
-        get position(): number { return this.m_position; }
 
-        enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<T> {
-            return Helpers.repeat<T>(() => { return this.next(); }, failure, delayMs, this.m_collection.length);
-        }
         next(): T {
             if (this.hasNext) {
                 var current: T = this.m_collection[this.m_position];
@@ -54,19 +42,17 @@
 
         constructor(collection: Array<T> = []) { this.m_collection = collection; }
     }
-    export class Stream<T> implements IStream<T> {
-        private m_deferred: IDeferred<T>;
+    export class Repeater {
+        private m_deferred: IDeferred<any>;
 
-        get value() { return this.m_deferred.value; }
-
-        start(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<T> {
-            var deferred = Helpers.repeat<T>(success, failure, delayMs, maxExecutions);
+        start(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<any> {
+            var deferred = Helpers.repeat<any>(success, failure, delayMs, maxExecutions);
 
             this.m_deferred = deferred;
 
             return deferred;
         }
-        stop(): IDeferred<T> {
+        stop(): IDeferred<any> {
             this.m_deferred.status = DeferredStatus.Completed;
 
             return this.m_deferred;
@@ -216,3 +202,16 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var i = 0;
+var counter = new kcl.Repeater();
+counter.start(() => {
+    i++;
+
+    if (i === 100) {
+        counter.stop();
+        console.log(i);
+    }
+}, null);
+
+console.log("Hello world!");

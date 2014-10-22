@@ -131,7 +131,7 @@
                 status: DeferredStatus.Pending,
                 value: undefined
             };
-            
+
             var looper = () => {
                 var start: number = Date.now();
                 result.handler = setTimeout(looper, delayMs); // spawn next looper
@@ -187,7 +187,7 @@
 
             return Object.prototype.toString.call(obj).slice(8, -1);
         }
-        private static is<T>(typeName: string, obj: T): boolean { return Helpers.getClass(obj) === typeName; }
+        private static is<T>(type: JsTypes, obj: T): boolean { return Helpers.getClass(obj) === type; }
     }
     export class JsTypes {
         static jsArray = "Array";

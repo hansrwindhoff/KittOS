@@ -7,7 +7,6 @@
         Failed = 2,
     }
     export interface IDeferred<T> {
-        handler: number;
         status: DeferredStatus;
         value: T;
     }
@@ -42,26 +41,10 @@
 
         constructor(collection: Array<T> = []) { this.m_collection = collection; }
     }
-    export class Repeater {
-        private m_deferred: IDeferred<any>;
-
-        start(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<any> {
-            var deferred = Helpers.repeat<any>(success, failure, delayMs, maxExecutions);
-
-            this.m_deferred = deferred;
-
-            return deferred;
-        }
-        stop(): IDeferred<any> {
-            this.m_deferred.status = DeferredStatus.Completed;
-
-            return this.m_deferred;
-        }
-    }
 
     export class Helpers {
         static defer<T>(success?: Function, failure?: Function, delayMs: number = 0): IDeferred<T> {
-            var result: IDeferred<T> = {
+            var result = {
                 handler: undefined,
                 status: DeferredStatus.Pending,
                 value: undefined
@@ -72,7 +55,7 @@
                     result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
                     result.status = DeferredStatus.Completed; // mark as completed
                 } catch (e) {
-                    result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
+                    result.value = Helpers.nullApply((failure || Helpers.noOp), e); // reject
                     result.status = DeferredStatus.Failed; // mark as failed
                 }
             }, delayMs);
@@ -102,6 +85,31 @@
                 }
             }
         }
+        static loop<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> { // Why default delayMs of 4? See: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0.            
+            var result: IDeferred<T> = {
+                status: DeferredStatus.Pending,
+                value: undefined
+            };
+
+            var looper = () => {
+                var next = setTimeout(looper, delayMs); // spawn next looper
+
+                if (result.status !== DeferredStatus.Pending) { // fulfilled or rejected
+                    clearTimeout(next); // cancel next looper
+                } else {
+                    try {
+                        result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
+                    } catch (e) {
+                        result.status = DeferredStatus.Failed; // reject
+                        result.value = Helpers.nullApply((failure || Helpers.noOp), e); // call failure no-op
+                    }
+                }
+            }
+
+            setTimeout(looper, delayMs); // start first looper
+
+            return result;
+        }
         static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Array<TResult> {
             var mapped: Array<TResult> = [];
 
@@ -122,44 +130,6 @@
             while (iterator.hasNext) { accumulator = Helpers.nullApply(reducer, accumulator, iterator.next()); }
 
             return accumulator;
-        }
-        static repeat<T>(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<T> {
-            delayMs = ((kcl.Helpers.isNumber(delayMs) && delayMs > 4) ? delayMs : 4) // set delayMs to 4 if not number or < 4 (see: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0)
-            var numExecutions: number = 0;
-            var result: IDeferred<T> = {
-                handler: undefined, // handler of the next looper
-                status: DeferredStatus.Pending,
-                value: undefined
-            };
-
-            var looper = () => {
-                var start: number = Date.now();
-                result.handler = setTimeout(looper, delayMs); // spawn next looper
-
-                do { // start loop
-                    try {
-                        numExecutions++;
-                        result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
-                    } catch (e) {
-                        result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
-                        result.status = DeferredStatus.Failed; // mark as failed
-                    } finally {
-                        if (numExecutions === maxExecutions) { // maxExecutions reached
-                            result.status = DeferredStatus.Completed; // mark as complete
-                        }
-
-                        if (result.status !== DeferredStatus.Pending) { // fulfilled or rejected
-                            clearTimeout(result.handler); // cancel next looper
-                            break; // break from loop
-                        }
-                    }
-                }
-                while (((Date.now() - start) < delayMs)); // break from loop after delayMs reached
-            }
-
-            result.handler = setTimeout(looper, 0); // start first looper
-
-            return result;
         }
         static wrap<T>(obj: T): Function { return (): T => { return obj; } }
 

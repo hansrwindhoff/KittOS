@@ -19,9 +19,10 @@
     }
     export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
+    export interface IObservable<T> { value: T; }
     export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
-    export interface IStream<T> {
+    export interface IStream<T> extends IObservable<T> {
         start(): any;
         stop(): any;
     }
@@ -56,6 +57,8 @@
     export class Stream<T> implements IStream<T> {
         private m_deferred: IDeferred<T>;
 
+        get value() { return this.m_deferred.value; }
+
         start(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<T> {
             var deferred = Helpers.repeat<T>(success, failure, delayMs, maxExecutions);
 
@@ -63,8 +66,10 @@
 
             return deferred;
         }
-        stop() {
+        stop(): IDeferred<T> {
             this.m_deferred.status = DeferredStatus.Completed;
+
+            return this.m_deferred;
         }
     }
 
@@ -152,17 +157,18 @@
                     } catch (e) {
                         result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
-                    } finally {
-                        if (numExecutions === maxExecutions) {
-                            result.status = DeferredStatus.Completed; // mark as complete
-                        }
+                    }
 
-                        if (result.status !== DeferredStatus.Pending) {
-                            clearTimeout(result.handler); // cancel next looper
-                        }
+                    if (numExecutions === maxExecutions) {
+                        result.status = DeferredStatus.Completed; // mark as complete
+                    }
+
+                    if (result.status !== DeferredStatus.Pending) {
+                        clearTimeout(result.handler); // cancel next looper
+                        break;
                     }
                 }
-                while (((Date.now() - start) < delayMs) && DeferredStatus.Pending);
+                while (((Date.now() - start) < delayMs));
             }
 
             result.handler = setTimeout(looper, 4); // start looping
@@ -210,35 +216,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var i = 0;
-var js = [];
-var s = new kcl.Stream<number>();
-s.start(() => {
-    var start: number = Date.now();
-
-    do {
-        var t = i++;
-        js.push(Math.abs(t * 2 / 21 + 120));
-
-        if (js.length === 1000) {
-            js = [];
-        }
-    }
-    while ((Date.now() - start) < 4);
-}, null, null);
-
-setTimeout(() => {
-    console.log(i);
-    console.log(js);
-    s.stop();
-
-    var j = 0;
-    var start: number = Date.now();
-
-    for (j, i; j < i; j++) {
-        Math.abs(j * 2 / 21 + 120);
-    }
-
-    console.log(Date.now() - start);
-}, 3000);

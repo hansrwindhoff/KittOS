@@ -131,7 +131,7 @@
                 status: DeferredStatus.Pending,
                 value: undefined
             };
-            var numLoops: number = 0;
+            
             var looper = () => {
                 var start: number = Date.now();
                 result.handler = setTimeout(looper, delayMs); // spawn next looper
@@ -144,11 +144,11 @@
                         result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
                     } finally {
-                        if (numExecutions === maxExecutions) {
+                        if (numExecutions === maxExecutions) { // maxExecutions reached
                             result.status = DeferredStatus.Completed; // mark as complete
                         }
 
-                        if (result.status !== DeferredStatus.Pending) {
+                        if (result.status !== DeferredStatus.Pending) { // fulfilled or rejected
                             clearTimeout(result.handler); // cancel next looper
                             break; // break from loop
                         }

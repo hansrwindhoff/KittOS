@@ -150,28 +150,28 @@
                 var start: number = Date.now();
                 result.handler = setTimeout(looper, delayMs); // spawn next looper
 
-                do {
+                do { // start loop
                     try {
                         numExecutions++;
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
                     } catch (e) {
                         result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
-                    }
+                    } finally {
+                        if (numExecutions === maxExecutions) {
+                            result.status = DeferredStatus.Completed; // mark as complete
+                        }
 
-                    if (numExecutions === maxExecutions) {
-                        result.status = DeferredStatus.Completed; // mark as complete
-                    }
-
-                    if (result.status !== DeferredStatus.Pending) {
-                        clearTimeout(result.handler); // cancel next looper
-                        break;
+                        if (result.status !== DeferredStatus.Pending) {
+                            clearTimeout(result.handler); // cancel next looper
+                            break; // break from loop
+                        }
                     }
                 }
-                while (((Date.now() - start) < delayMs));
+                while (((Date.now() - start) < delayMs)); // break from loop after delayMs reached
             }
 
-            result.handler = setTimeout(looper, 4); // start looping
+            result.handler = setTimeout(looper, 0); // start first looper
 
             return result;
         }

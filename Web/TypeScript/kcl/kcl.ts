@@ -202,16 +202,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var i = 0;
-var counter = new kcl.Repeater();
-counter.start(() => {
-    i++;
-
-    if (i === 100) {
-        counter.stop();
-        console.log(i);
-    }
-}, null);
-
-console.log("Hello world!");

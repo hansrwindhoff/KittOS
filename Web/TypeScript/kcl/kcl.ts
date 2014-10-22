@@ -43,13 +43,13 @@
     }
 
     export class Helpers {
-        static defer<T>(success?: Function, failure?: Function, delayMs: number = 0): IDeferred<T> {
+        static defer<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result = {
                 status: DeferredStatus.Pending,
                 value: undefined
             };
 
-            setTimeout(() => { // start delay
+            setTimeout(() => { // begin defer
                 if (result.status === DeferredStatus.Pending) { // defer wasn't cancelled
                     try {
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
@@ -86,7 +86,7 @@
                 }
             }
         }
-        static loop<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> { // Why default delayMs of 4? See: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0.            
+        static loop<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result: IDeferred<T> = {
                 status: DeferredStatus.Pending,
                 value: undefined

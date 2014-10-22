@@ -6,6 +6,7 @@
         Completed = 1,
         Failed = 2,
     }
+    export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
     export interface IDeferred<T> {
         status: DeferredStatus;
         value: T;
@@ -14,7 +15,6 @@
         hasNext: boolean;
         next(): T;
     }
-    export interface IAsyncIterator<T> extends IIterator<T> { nextAsync(): IDeferred<T>; }
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
     export interface IObservable<T> { value: T; }
     export interface IPredicate { (...args: any[]): boolean; }
@@ -40,6 +40,28 @@
         }
 
         constructor(collection: Array<T> = []) { this.m_collection = collection; }
+    }
+    export class Stream<T> implements IObservable<Array<T>> {
+        private m_deferred: IDeferred<Array<T>> = { status: undefined, value: undefined };
+
+        get value(): Array<T> { return this.m_deferred.value; }
+
+        start(success?: Function, failure?: Function, delayMs?: number) {
+            delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4; // default delayMs to 4 if not a number or less than 4
+            var deferred = Helpers.loop<Array<T>>(() => {
+                var start: number = Date.now();
+                var results = [];
+
+                while ((Date.now() - start) < delayMs) { results.push(Helpers.nullApply((success || Helpers.noOp))); }
+
+                return results;
+            }, failure, delayMs);
+
+            this.m_deferred = deferred;
+
+            return this.m_deferred;
+        }
+        stop() { this.m_deferred.status = DeferredStatus.Completed; }
     }
 
     export class Helpers {

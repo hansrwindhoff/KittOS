@@ -21,6 +21,10 @@
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
     export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
+    export interface IStream<T> {
+        start(): any;
+        stop(): any;
+    }
 
     export class Iterator<T> implements IAsyncIterator<T> {
         private m_collection: Array<T>;
@@ -31,7 +35,7 @@
         get position(): number { return this.m_position; }
 
         enumerate(): void { while (this.hasNext) { this.next(); } }
-        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<Array<T>> {
+        enumerateAsync(failure?: Function, delayMs?: number): IDeferred<T> {
             return Helpers.repeat<T>(() => { return this.next(); }, failure, delayMs, this.m_collection.length);
         }
         next(): T {
@@ -48,6 +52,20 @@
         }
 
         constructor(collection: Array<T> = []) { this.m_collection = collection; }
+    }
+    export class Stream<T> implements IStream<T> {
+        private m_deferred: IDeferred<T>;
+
+        start(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<T> {
+            var deferred = Helpers.repeat<T>(success, failure, delayMs, maxExecutions);
+
+            this.m_deferred = deferred;
+
+            return deferred;
+        }
+        stop() {
+            this.m_deferred.status = DeferredStatus.Completed;
+        }
     }
 
     export class Helpers {
@@ -100,9 +118,6 @@
 
             return mapped;
         }
-        static mapAsync<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>, failure?: Function): IDeferred<Array<TResult>> {
-            return Helpers.repeat<TResult>(() => { return Helpers.nullApply(mapper, iterator.next()); }, failure, null, iterator.length);
-        }
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }
         static partial(func: Function, ...args: any[]): Function {
@@ -117,15 +132,15 @@
 
             return accumulator;
         }
-        static repeat<T>(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<Array<T>> {
+        static repeat<T>(success?: Function, failure?: Function, delayMs?: number, maxExecutions?: number): IDeferred<T> {
             delayMs = ((kcl.Helpers.isNumber(delayMs) && delayMs > 4) ? delayMs : 4) // set delayMs to 4 if not number or < 4 (see: https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0)
             var numExecutions: number = 0;
-            var result: IDeferred<Array<T>> = {
+            var result: IDeferred<T> = {
                 handler: undefined, // handler of the next looper
                 status: DeferredStatus.Pending,
-                value: []
+                value: undefined
             };
-
+            var numLoops: number = 0;
             var looper = () => {
                 var start: number = Date.now();
                 result.handler = setTimeout(looper, delayMs); // spawn next looper
@@ -133,18 +148,21 @@
                 do {
                     try {
                         numExecutions++;
-                        result.value.push(Helpers.nullApply((success || Helpers.noOp))); // fulfill
+                        result.value = Helpers.nullApply((success || Helpers.noOp)); // fulfill
                     } catch (e) {
-                        result.value.push(Helpers.nullApply((failure || Helpers.noOp), [e])); // reject
+                        result.value = Helpers.nullApply((failure || Helpers.noOp), [e]); // reject
                         result.status = DeferredStatus.Failed; // mark as failed
+                    } finally {
+                        if (numExecutions === maxExecutions) {
+                            result.status = DeferredStatus.Completed; // mark as complete
+                        }
+
+                        if (result.status !== DeferredStatus.Pending) {
+                            clearTimeout(result.handler); // cancel next looper
+                        }
                     }
                 }
-                while (((Date.now() - start) < delayMs) && numExecutions < maxExecutions);
-
-                if (numExecutions === maxExecutions) {
-                    clearTimeout(result.handler); // cancel next looper
-                    result.status = DeferredStatus.Completed; // mark as complete
-                }
+                while (((Date.now() - start) < delayMs) && DeferredStatus.Pending);
             }
 
             result.handler = setTimeout(looper, 4); // start looping
@@ -192,3 +210,35 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var i = 0;
+var js = [];
+var s = new kcl.Stream<number>();
+s.start(() => {
+    var start: number = Date.now();
+
+    do {
+        var t = i++;
+        js.push(Math.abs(t * 2 / 21 + 120));
+
+        if (js.length === 1000) {
+            js = [];
+        }
+    }
+    while ((Date.now() - start) < 4);
+}, null, null);
+
+setTimeout(() => {
+    console.log(i);
+    console.log(js);
+    s.stop();
+
+    var j = 0;
+    var start: number = Date.now();
+
+    for (j, i; j < i; j++) {
+        Math.abs(j * 2 / 21 + 120);
+    }
+
+    console.log(Date.now() - start);
+}, 3000);

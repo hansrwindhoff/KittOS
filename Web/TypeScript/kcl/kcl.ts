@@ -27,7 +27,7 @@
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
 
         next(): T {
-            if (this.hasNext) {
+            if (this.hasNext) { // no-op if at end of array
                 var current: T = this.m_collection[this.m_position];
 
                 this.m_position++;

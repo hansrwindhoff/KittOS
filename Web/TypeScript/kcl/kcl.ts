@@ -57,8 +57,8 @@
         }
 
         start(): void {
-            if (this.status === undefined || this.status === DeferredStatus.Completed) {
-                this.m_deferred = Helpers.loop<T>(this.m_success, this.m_failure, this.m_delayMs);
+            if (this.status === undefined || this.status === DeferredStatus.Completed) { // start or restart stream
+                this.m_deferred = Helpers.loop<T>(this.m_success, this.m_failure, this.m_delayMs); // begin async loop
             }
         }
         stop(): void { this.m_deferred.status = DeferredStatus.Completed; }
@@ -156,6 +156,7 @@
         }
         static wrap<T>(obj: T): Function { return (): T => { return obj; } }
 
+        static is<T>(jsType: JsTypes, obj: T): boolean { return Helpers.getClass(obj) === jsType; }
         static isArray<T>(obj: T): boolean { return Helpers.is(JsTypes.jsArray, obj); }
         static isFunction<T>(obj: T): boolean { return Helpers.is(JsTypes.jsFunction, obj); }
         static isNumber(str: string): boolean;
@@ -179,8 +180,7 @@
             // Caution: returns "Object" for all user-defined types
 
             return Object.prototype.toString.call(obj).slice(8, -1);
-        }
-        private static is<T>(type: JsTypes, obj: T): boolean { return Helpers.getClass(obj) === type; }
+        }        
     }
     export class JsTypes {
         static jsArray = "Array";

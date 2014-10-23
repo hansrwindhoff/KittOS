@@ -20,7 +20,7 @@
     export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
 
-    export class Iterator<T> implements IAsyncIterator<T> {
+    export class ArrayIterator<T> implements IAsyncIterator<T> {
         private m_collection: Array<T>;
         private m_position: number = 0;
 
@@ -52,8 +52,8 @@
 
         constructor(success?: Function, failure?: Function, delayMs?: number) {
             this.m_delayMs = delayMs;
-            this.m_failure = failure || Helpers.noOp;
-            this.m_success = success || Helpers.noOp;
+            this.m_failure = (failure || Helpers.noOp);
+            this.m_success = (success || Helpers.noOp);
         }
 
         start(): void {
@@ -85,7 +85,7 @@
 
             return result;
         }
-        static filter<T>(predicate: IPredicate, iterator: IIterator<T>): Iterator<T> {
+        static filter<T>(predicate: IPredicate, iterator: IIterator<T>): Array<T> {
             var filtered: Array<T> = [];
 
             while (iterator.hasNext) {
@@ -96,7 +96,7 @@
                 }
             }
 
-            return new Iterator(filtered);
+            return filtered;
         }
         static limit(func: Function, maxExecutions: number = 1): Function {
             var numExecutions: number = 0;

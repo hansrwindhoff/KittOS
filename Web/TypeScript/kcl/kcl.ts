@@ -43,25 +43,38 @@
     }
     export class Stream<T> implements IObservable<Array<T>> {
         private m_deferred: IDeferred<Array<T>> = { status: undefined, value: undefined };
+        private m_delayMs: number;
+        private m_failure: Function;
+        private m_success: Function;
 
+        get status(): DeferredStatus { return this.m_deferred.status; }
         get value(): Array<T> { return this.m_deferred.value; }
 
-        start(success?: Function, failure?: Function, delayMs?: number) {
+        constructor(success?: Function, failure?: Function, delayMs?: number) {
             delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4; // default delayMs to 4 if not a number or less than 4
-            var deferred = Helpers.loop<Array<T>>(() => {
-                var start: number = Date.now();
-                var results = [];
 
-                while ((Date.now() - start) < delayMs) { results.push(Helpers.nullApply((success || Helpers.noOp))); }
-
-                return results;
-            }, failure, delayMs);
-
-            this.m_deferred = deferred;
-
-            return this.m_deferred;
+            this.m_delayMs = delayMs;
+            this.m_failure = failure || Helpers.noOp;
+            this.m_success = success || Helpers.noOp;
         }
-        stop() { this.m_deferred.status = DeferredStatus.Completed; }
+
+        start(): void {
+            if (this.status === undefined || this.status === DeferredStatus.Completed) {
+                var deferred = Helpers.loop<Array<T>>(() => {
+                    var start: number = Date.now();
+                    var results = [];
+
+                    while (this.m_deferred.status === DeferredStatus.Pending && ((Date.now() - start) < this.m_delayMs)) {
+                        results.push(Helpers.nullApply(this.m_success));
+                    }
+
+                    return results;
+                }, this.m_failure, this.m_delayMs);
+
+                this.m_deferred = deferred;
+            }
+        }
+        stop(): void { this.m_deferred.status = DeferredStatus.Completed; }
     }
 
     export class Helpers {
@@ -195,3 +208,10 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var s = new kcl.Stream(() => { 4 * 5; });
+s.start();
+s.start();
+s.stop();
+s.start();
+s.stop();

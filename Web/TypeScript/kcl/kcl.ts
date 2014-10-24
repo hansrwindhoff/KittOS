@@ -182,6 +182,19 @@
                 return Helpers.nullApply(func, args.concat(calledArgs));
             };
         }
+        /// pipeline: Function
+        /// Params:
+        ///     funcs: Array<Function> - an array of functions to be executed
+        ///
+        /// Description: Returns a new function that accepts a variable number of arguments. The arguments that are
+        ///              supplied to the new function will be passed to the first function in funcs. Each function is
+        ///              executed in the order supplied and the results are passed to the next function.
+        ///
+        /// Usage: var cube = (n:number) => { return n * n * n; };
+        ///        var half = (n:number) => { return n / 2; };
+        ///        var cubeHalfPrint = kcl.Helpers.pipeline(cube, half, console.log.bind(console));
+        ///        cubeHalfPrint(2); // prints 4
+        ///        cubeHalfPrint(3); // prints 13.5
         static pipeline(...funcs: Function[]) {
             return (...args: any[]) => {
                 return Helpers.reduce((funcArgs: any, func: Function) => {

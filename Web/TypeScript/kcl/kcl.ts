@@ -127,13 +127,13 @@
         /// Params:
         ///    success: Function (optional) - called repeatedly after the specified delay
         ///    failure: Function (optional) - called when an error is thrown
-        ///    delayMs: Number (optional), default 4 - how long, in milliseconds, to wait between loops
+        ///    delayMs: Number (optional), default 4 - how long, in milliseconds, to delay between loops
         ///
-        /// Description: Asychronously executes a function repeatedly until marked as failed or completed. Like defer<T>
-        ///              an IDeferred<T> is immediately returned that has a value of undefined. After a delay the success
-        ///              function is executed and the result is stored in the deferred's value property (overriding the
-        ///              previous value every execution). Looping stops once the deferred's status property is marked as
-        ///              anything other than pending.
+        /// Description: Asychronously executes a function repeatedly every X milliseconds (specified by deferMs). Like
+        ///              defer<T> an IDeferred<T> is immediately returned that has a value of undefined. After a delay the
+        ///              success function is executed and the result is stored in the deferred's value property (overriding 
+        ///              the previous value every execution). Looping stops once the deferred's status property is marked
+        ///              as anything other than pending.
         ///
         /// Usage: var i = 0;
         ///        var counter = kcl.Helpers.loop(() => {

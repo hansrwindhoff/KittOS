@@ -1,0 +1,12 @@
+﻿Asynchronous JS:
+
+https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/Hn3GxRLXmR0
+
+Functional JS:
+
+http://tech.pro/tutorial/2011/functional-javascript-part-4-function-currying
+
+General JS:
+
+http://bonsaiden.github.io/JavaScript-Garden/#types.typeof
+http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/

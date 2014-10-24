@@ -19,10 +19,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="index.html" />
+    <Content Include="Thanks.txt" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="kcl.ts" />
+    <TypeScriptCompile Include="loader.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">

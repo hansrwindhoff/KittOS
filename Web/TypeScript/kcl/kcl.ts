@@ -118,7 +118,7 @@
                 var next = setTimeout(looper, delayMs); // spawn next looper
 
                 if (result.status !== DeferredStatus.Pending) { // fulfilled or rejected
-                    clearTimeout(next); // cancel next looper
+                    clearTimeout(next); // kill next looper
                 } else {
                     try {
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
@@ -145,7 +145,14 @@
         static partial(func: Function, ...args: any[]): Function {
             return (...calledArgs: any[]) => {
                 return Helpers.nullApply(func, args.concat(calledArgs));
-            }
+            };
+        }
+        static pipeline(...funcs: Function[]) {
+            return (...args: any[]) => {
+                return Helpers.reduce((funcArgs: any, func: Function) => {
+                    return Helpers.nullApply(func, funcArgs);
+                }, new ArrayIterator(funcs), args);
+            };
         }
         static reduce<TInput, TResult>(reducer: IReducer<TInput, TResult>, iterator: IIterator<TInput>, seedValue?: TResult): TResult {
             var accumulator: TResult = seedValue;
@@ -180,7 +187,7 @@
             // Caution: returns "Object" for all user-defined types
 
             return Object.prototype.toString.call(obj).slice(8, -1);
-        }        
+        }
     }
     export class JsTypes {
         static jsArray = "Array";

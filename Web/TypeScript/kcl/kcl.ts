@@ -132,8 +132,8 @@
         /// Description: Asychronously executes a function repeatedly every X milliseconds (specified by deferMs). Like
         ///              defer<T> an IDeferred<T> is immediately returned that has a value of undefined. The result of the
         ///              success function is stored in the deferred's value property (overriding the previous value after 
-        ///              every execution). Looping stops once the deferred's status property is marked
-        ///              as anything other than pending.
+        ///              every execution). Looping stops once the deferred's status property is marked as anything other
+        ///              than pending.
         ///
         /// Usage: var i = 0;
         ///        var counter = kcl.Helpers.loop(() => {

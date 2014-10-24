@@ -65,7 +65,7 @@
     }
 
     export class Helpers {
-        /// Defer<T>: Function
+        /// defer<T>: Function
         /// Params:
         ///     success: Function (optional) - called after the specified delay
         ///     failure: Function (optional) - called when an error is thrown
@@ -76,10 +76,10 @@
         ///              in the deferred's value property. Exceptions are caught and passed to the failure function and the
         ///              deferred is marked as failed. Both success and failure will default a no-op if not supplied.
         ///
-        /// Usage: kcl.Deferred(() => { console.log("Hello world!"); }, null, 1000); // prints "Hello world!" after 1 second
-        ///        var d = kcl.Deferred(() => { return 1; }, null, 1000); // stores the deferred in a variable d
+        /// Usage: kcl.Helpers.defer(() => { console.log("Hello world!"); }, null, 1000); // prints "Hello world!" after 1 second
+        ///        var d = kcl.Helpers.defer(() => { return 1; }, null, 1000); // stores the deferred in a variable d
         ///        console.log(d.value); // prints undefined
-        ///        kcl.Deferred(() => { console.log(d.value); }, null), 2000); // prints 1
+        ///        kcl.Helpers.defer(() => { console.log(d.value); }, null), 2000); // prints 1
         static defer<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result = {
                 status: DeferredStatus.Pending,
@@ -123,15 +123,26 @@
                 }
             }
         }
-        /// Loop<T>: Function
+        /// loop<T>: Function
         /// Params:
         ///    success: Function (optional) - called repeatedly after the specified delay
         ///    failure: Function (optional) - called when an error is thrown
         ///    delayMs: Number (optional), default 4 - how long, in milliseconds, to wait between loops
+        ///
         /// Description: Asychronously executes a function repeatedly until marked as failed or completed. Like defer<T>
         ///              an IDeferred<T> is immediately returned that has a value of undefined. After a delay the success
         ///              function is executed and the result is stored in the deferred's value property (overriding the
-        ///              previous value every execution).
+        ///              previous value every execution). Looping stops once the deferred's status property is marked as
+        ///              anything other than pending.
+        ///
+        /// Usage: var i = 0;
+        ///        var counter = kcl.Helpers.loop(() => {
+        ///            i++;
+        ///            if(i === 5) { counter.status = kcl.DeferredStatus.Completed; } // stops loop after i reaches 5
+        ///            return i;
+        ///        }, null, 1000); // call every 1 second
+        ///        console.log(counter.value); // prints undefined
+        ///        kcl.Helpers.defer(() => { console.log(counter.value); }, null, 6000); // prints 5
         static loop<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result: IDeferred<T> = {
                 status: DeferredStatus.Pending,

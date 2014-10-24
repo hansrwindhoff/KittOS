@@ -65,6 +65,21 @@
     }
 
     export class Helpers {
+        /// Defer<T>: Function
+        /// Params:
+        ///     success: Function (optional) - called after the specified delay
+        ///     failure: Function (optional) - called when an error is thrown
+        ///     delayMs: Number (optional), default 4 - how long, in milliseconds, to delay execution
+        /// 
+        /// Description: Asynchronously delays function execution for a period of time. An IDeferred<T> is immediately
+        ///              returned that will have a value of undefined. When the function executes the result will be stored
+        ///              in the deferred's value property. Exceptions are caught and passed to the failure function and the
+        ///              deferred is marked as failed. Both success and failure will default a no-op if not supplied.
+        ///
+        /// Usage: kcl.Deferred(() => { console.log("Hello world!"); }, null, 1000); // prints "Hello world!" after 1 second
+        ///        var d = kcl.Deferred(() => { return 1; }, null, 1000); // stores the deferred in a variable d
+        ///        console.log(d.value); // prints undefined
+        ///        kcl.Deferred(() => { console.log(d.value); }, null), 2000); // prints 1
         static defer<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result = {
                 status: DeferredStatus.Pending,
@@ -108,6 +123,15 @@
                 }
             }
         }
+        /// Loop<T>: Function
+        /// Params:
+        ///    success: Function (optional) - called repeatedly after the specified delay
+        ///    failure: Function (optional) - called when an error is thrown
+        ///    delayMs: Number (optional), default 4 - how long, in milliseconds, to wait between loops
+        /// Description: Asychronously executes a function repeatedly until marked as failed or completed. Like defer<T>
+        ///              an IDeferred<T> is immediately returned that has a value of undefined. After a delay the success
+        ///              function is executed and the result is stored in the deferred's value property (overriding the
+        ///              previous value every execution).
         static loop<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
             var result: IDeferred<T> = {
                 status: DeferredStatus.Pending,

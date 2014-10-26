@@ -186,6 +186,21 @@
 
             return mapped;
         }
+        static mapAsync<TInput, TOutput>(iterator: IIterator<TInput>, mapper: IMapper<TInput, TOutput>, failure?: Function, batchSizeMs?: number): IDeferred<Array<TOutput>> {
+            var aBatch = Helpers.batch<Array<TOutput>>(() => { // start async batch
+                if (iterator.hasNext) {
+                    aBatch.value.push(Helpers.nullApply(mapper, iterator.next())); // call mapper and add result to batch array
+                } else {
+                    aBatch.status = DeferredStatus.Completed; // fulfill
+                }
+
+                return aBatch.value; // return latest mapper results
+            }, failure, batchSizeMs);
+
+            aBatch.value = []; // initialize batch array
+
+            return aBatch;
+        }
         static noOp(): void { }
         static nullApply(func: Function, ...args: any[]): any { return func.apply(null, args); }
         static partial(func: Function, ...args: any[]): Function {
@@ -261,3 +276,15 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var nums = [1, 2, 3, 4, 5];
+var it = new kcl.ArrayIterator(nums);
+var m = kcl.Helpers.mapAsync(it, (num: number) => {
+    return num * 2;
+}, null);
+
+console.log(m);
+
+setTimeout(() => {
+    console.log(m);
+}, 1000);

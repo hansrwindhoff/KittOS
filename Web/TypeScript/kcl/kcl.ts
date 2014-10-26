@@ -179,22 +179,22 @@
 
             return result;
         }
-        static map<TInput, TResult>(mapper: IMapper<TInput, TResult>, iterator: IIterator<TInput>): Array<TResult> {
+        static map<TInput, TResult>(iterator: IIterator<TInput>, mapper: IMapper<TInput, TResult>): Array<TResult> {
             var mapped: Array<TResult> = [];
 
             while (iterator.hasNext) { mapped.push(Helpers.nullApply(mapper, iterator.next())); }
 
             return mapped;
         }
-        static mapAsync<TInput, TOutput>(iterator: IIterator<TInput>, mapper: IMapper<TInput, TOutput>, failure?: Function, batchSizeMs?: number): IDeferred<Array<TOutput>> {
+        static mapAsync<TInput, TOutput>(iterator: IIterator<TInput>, success: IMapper<TInput, TOutput>, failure?: Function, batchSizeMs?: number): IDeferred<Array<TOutput>> {
             var aBatch = Helpers.batch<Array<TOutput>>(() => { // start async batch
                 if (iterator.hasNext) {
-                    aBatch.value.push(Helpers.nullApply(mapper, iterator.next())); // call mapper and add result to batch array
+                    aBatch.value.push(Helpers.nullApply(success, iterator.next())); // call success and add result to batch array
                 } else {
                     aBatch.status = DeferredStatus.Completed; // fulfill
                 }
 
-                return aBatch.value; // return latest mapper results
+                return aBatch.value; // return latest success results
             }, failure, batchSizeMs);
 
             aBatch.value = []; // initialize batch array

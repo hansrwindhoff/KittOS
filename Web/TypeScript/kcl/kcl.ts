@@ -135,17 +135,17 @@
             return filtered;
         }
         static forEachAsync<T>(iterator: IIterator<T>, success: Function, failure?: Function, batchSizeMs?: number): IDeferred<number> {
-            var result = kcl.Helpers.batch<number>(() => {
+            var aBatch = kcl.Helpers.batch<number>(() => { // start async batch
                 if (iterator.hasNext) {
-                    Helpers.nullApply(success, iterator.next());
-                    return iterator.position;
+                    Helpers.nullApply(success, iterator.next()); // call success
                 } else {
-                    result.status = kcl.DeferredStatus.Completed;
-                    return result.value;
+                    aBatch.status = kcl.DeferredStatus.Completed; // fulfill
                 }
+
+                return iterator.position;
             }, failure, batchSizeMs);
 
-            return result;
+            return aBatch;
         }
         static limit(func: Function, maxExecutions: number = 1): Function {
             var numExecutions: number = 0;

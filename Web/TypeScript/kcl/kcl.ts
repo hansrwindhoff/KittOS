@@ -68,23 +68,23 @@
 
     export class Helpers {
         static batch<T>(success?: Function, failure?: Function, delayMs?: number) {
-            delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4;
+            delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4; // if delayMs is not number or < 4 then default to 4
 
-            var result = Helpers.loop<T>(() => {
+            var aLoop = Helpers.loop<T>(() => { // start async loop
                 var start: number = Date.now();
 
                 while ((Date.now() - start) < delayMs) {
-                    if (result.status !== DeferredStatus.Pending) {
-                        break;
+                    if (aLoop.status !== DeferredStatus.Pending) { // fulfilled or rejected 
+                        break; // exit while loop
                     }
 
-                    result.value = Helpers.nullApply((success || Helpers.noOp));
+                    aLoop.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
                 };
 
-                return result.value
+                return aLoop.value // return latest value
             }, failure, delayMs);
 
-            return result;
+            return aLoop;
         }
         /// defer<T>: Function
         /// Params:
@@ -284,12 +284,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var num = [1, 2, 3];
-var it = new kcl.ArrayIterator(num);
-var r = kcl.Helpers.forEachAsync(it, (i) => { console.log(i); });
-console.log(r);
-
-setTimeout(() => {
-    console.log(r);
-}, 15);

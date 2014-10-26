@@ -14,6 +14,7 @@
     export interface IIterator<T> {
         hasNext: boolean;
         next(): T;
+        position: number;
     }
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
     export interface IObservable<T> { value: T; }
@@ -25,6 +26,7 @@
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
+        get position(): number { return this.m_position; }
 
         next(): T {
             if (this.hasNext) { // no-op if at end of array
@@ -136,7 +138,7 @@
             var result = kcl.Helpers.batch<number>(() => {
                 if (iterator.hasNext) {
                     Helpers.nullApply(success, iterator.next());
-                    return (++result.value || 1);
+                    return iterator.position;
                 } else {
                     result.status = kcl.DeferredStatus.Completed;
                     return result.value;

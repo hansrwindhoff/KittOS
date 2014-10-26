@@ -17,7 +17,6 @@
         position: number;
     }
     export interface IMapper<TInput, TResult> { (input: TInput): TResult; }
-    export interface IObservable<T> { value: T; }
     export interface IPredicate { (...args: any[]): boolean; }
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
 
@@ -42,28 +41,6 @@
         }
 
         constructor(collection?: Array<T>) { this.m_collection = collection; }
-    }
-    export class Stream<T> implements IObservable<T> {
-        private m_deferred: IDeferred<T> = { status: undefined, value: undefined };
-        private m_delayMs: number;
-        private m_failure: Function;
-        private m_success: Function;
-
-        get status(): DeferredStatus { return this.m_deferred.status; }
-        get value(): T { return this.m_deferred.value; }
-
-        constructor(success?: Function, failure?: Function, delayMs?: number) {
-            this.m_delayMs = delayMs;
-            this.m_failure = (failure || Helpers.noOp);
-            this.m_success = (success || Helpers.noOp);
-        }
-
-        start(): void {
-            if (this.status === undefined || this.status === DeferredStatus.Completed) { // start or restart stream
-                this.m_deferred = Helpers.loop<T>(this.m_success, this.m_failure, this.m_delayMs); // begin async loop
-            }
-        }
-        stop(): void { this.m_deferred.status = DeferredStatus.Completed; }
     }
 
     export class Helpers {

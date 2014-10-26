@@ -98,7 +98,7 @@
 
             return result;
         }
-        static filter<T>(predicate: IPredicate, iterator: IIterator<T>): Array<T> {
+        static filter<T>(iterator: IIterator<T>, predicate: IPredicate): Array<T> {
             var filtered: Array<T> = [];
 
             while (iterator.hasNext) {
@@ -223,12 +223,12 @@
         ///        cubeHalfPrint(3); // prints 13.5
         static pipeline(...funcs: Function[]) {
             return (...args: any[]) => {
-                return Helpers.reduce((funcArgs: any, func: Function) => {
+                return Helpers.reduce(new ArrayIterator(funcs), (funcArgs: any, func: Function) => {
                     return Helpers.nullApply(func, funcArgs);
-                }, new ArrayIterator(funcs), args);
+                }, args);
             };
         }
-        static reduce<TInput, TResult>(reducer: IReducer<TInput, TResult>, iterator: IIterator<TInput>, seedValue?: TResult): TResult {
+        static reduce<TInput, TResult>(iterator: IIterator<TInput>, reducer: IReducer<TInput, TResult>, seedValue?: TResult): TResult {
             var accumulator: TResult = seedValue;
 
             while (iterator.hasNext) { accumulator = Helpers.nullApply(reducer, accumulator, iterator.next()); }

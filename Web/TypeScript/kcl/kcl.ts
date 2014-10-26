@@ -79,7 +79,7 @@
         ///        console.log(d.value); // prints undefined
         ///        kcl.Helpers.defer(() => { console.log(d.value); }, null), 2000); // prints 1
         static defer<T>(success?: Function, failure?: Function, delayMs: number = 4): IDeferred<T> {
-            var result = {
+            var result: IDeferred<T> = {
                 status: DeferredStatus.Pending,
                 value: undefined
             };
@@ -285,6 +285,6 @@ var m = kcl.Helpers.mapAsync(it, (num: number) => {
 
 console.log(m);
 
-setTimeout(() => {
+kcl.Helpers.defer(() => {
     console.log(m);
-}, 1000);
+}, null, 1000);

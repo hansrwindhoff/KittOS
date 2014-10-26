@@ -21,7 +21,7 @@
     export interface IReducer<TInput, TResult> { (previous: TResult, next: TInput): TResult; }
 
     export class ArrayIterator<T> implements IAsyncIterator<T> {
-        private m_collection: Array<T>;
+        private m_collection: Array<T> = [];
         private m_position: number = 0;
 
         get hasNext(): boolean { return this.m_position < this.m_collection.length; }
@@ -39,7 +39,7 @@
             return Helpers.defer<T>(() => { return this.next(); }, failure);
         }
 
-        constructor(collection: Array<T> = []) { this.m_collection = collection; }
+        constructor(collection?: Array<T>) { this.m_collection = collection; }
     }
     export class Stream<T> implements IObservable<T> {
         private m_deferred: IDeferred<T> = { status: undefined, value: undefined };
@@ -65,6 +65,25 @@
     }
 
     export class Helpers {
+        static batch<T>(success?: Function, failure?: Function, delayMs?: number) {
+            delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4;
+
+            var result = Helpers.loop<T>(() => {
+                var start: number = Date.now();
+
+                while ((Date.now() - start) < delayMs) {
+                    if (result.status !== DeferredStatus.Pending) {
+                        break;
+                    }
+
+                    result.value = Helpers.nullApply((success || Helpers.noOp));
+                };
+
+                return result.value
+            }, failure, delayMs);
+
+            return result;
+        }
         /// defer<T>: Function
         /// Params:
         ///     success: Function (optional) - called after the specified delay
@@ -74,7 +93,7 @@
         /// Description: Asynchronously delays function execution for a period of time. An IDeferred<T> is immediately
         ///              returned that will have a value of undefined. When the function executes the result will be stored
         ///              in the deferred's value property. Exceptions are caught and passed to the failure function and the
-        ///              deferred is marked as failed. Both success and failure will default a no-op if not supplied.
+        ///              deferred is marked as failed.
         ///
         /// Usage: kcl.Helpers.defer(() => { console.log("Hello world!"); }, null, 1000); // prints "Hello world!" after 1 second
         ///        var d = kcl.Helpers.defer(() => { return 1; }, null, 1000); // stores the deferred in a variable d
@@ -92,7 +111,7 @@
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
                         result.status = DeferredStatus.Completed; // fulfill
                     } catch (e) {
-                        result.value = Helpers.nullApply((failure || Helpers.noOp), e); // call failure or no-op
+                        result.value = Helpers.nullApply((failure || Helpers.wrap(e)), e); // call failure or return e
                         result.status = DeferredStatus.Failed; // reject
                     }
                 }
@@ -112,6 +131,19 @@
             }
 
             return filtered;
+        }
+        static forEachAsync<T>(iterator: IIterator<T>, success: Function, failure?: Function, batchSizeMs?: number): IDeferred<number> {
+            var result = kcl.Helpers.batch<number>(() => {
+                if (iterator.hasNext) {
+                    Helpers.nullApply(success, iterator.next());
+                    return (++result.value || 1);
+                } else {
+                    result.status = kcl.DeferredStatus.Completed;
+                    return result.value;
+                }
+            }, failure, batchSizeMs);
+
+            return result;
         }
         static limit(func: Function, maxExecutions: number = 1): Function {
             var numExecutions: number = 0;
@@ -159,12 +191,12 @@
                         result.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
                     } catch (e) {
                         result.status = DeferredStatus.Failed; // reject
-                        result.value = Helpers.nullApply((failure || Helpers.noOp), e); // call failure or no-op
+                        result.value = Helpers.nullApply((failure || Helpers.wrap(e)), e); // call failure or return e
                     }
                 }
             }
 
-            setTimeout(looper, delayMs); // start first looper
+            setTimeout(looper, 0); // start first looper
 
             return result;
         }
@@ -250,3 +282,12 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var num = [1, 2, 3];
+var it = new kcl.ArrayIterator(num);
+var r = kcl.Helpers.forEachAsync(it, (i) => { console.log(i); });
+console.log(r);
+
+setTimeout(() => {
+    console.log(r);
+}, 15);

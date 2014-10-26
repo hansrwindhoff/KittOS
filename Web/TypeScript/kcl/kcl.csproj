@@ -24,7 +24,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="kcl.ts" />
-    <TypeScriptCompile Include="loader.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">

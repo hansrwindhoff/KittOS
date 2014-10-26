@@ -44,13 +44,13 @@
     }
 
     export class Helpers {
-        static batch<T>(success?: Function, failure?: Function, delayMs?: number) {
-            delayMs = Helpers.isNumber(delayMs) && delayMs > 4 ? delayMs : 4; // if delayMs is not number or < 4 then default to 4
+        static batch<T>(success?: Function, failure?: Function, batchSizeMs?: number) {
+            batchSizeMs = Helpers.isNumber(batchSizeMs) && batchSizeMs > 4 ? batchSizeMs : 4; // if batchSizeMs is not number or < 4 then default to 4
 
             var aLoop = Helpers.loop<T>(() => { // start async loop
                 var start: number = Date.now();
 
-                while ((Date.now() - start) < delayMs) {
+                while ((Date.now() - start) < batchSizeMs) { // loop for batchSizeMs
                     if (aLoop.status !== DeferredStatus.Pending) { // fulfilled or rejected 
                         break; // exit while loop
                     }
@@ -59,7 +59,7 @@
                 };
 
                 return aLoop.value // return latest value
-            }, failure, delayMs);
+            }, failure, batchSizeMs);
 
             return aLoop;
         }

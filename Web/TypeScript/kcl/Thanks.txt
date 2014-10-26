@@ -10,3 +10,8 @@ General JS:
 
 http://bonsaiden.github.io/JavaScript-Garden/#types.typeof
 http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+
+General TS:
+
+http://www.sitepen.com/blog/2013/12/31/definitive-guide-to-typescript/
+http://www.sitepen.com/blog/2013/12/31/typescript-cheat-sheet/

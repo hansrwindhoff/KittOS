@@ -56,7 +56,7 @@
                     }
 
                     aLoop.value = Helpers.nullApply((success || Helpers.noOp)); // call success or no-op
-                };
+                }
 
                 return aLoop.value // return latest value
             }, failure, batchSizeMs);

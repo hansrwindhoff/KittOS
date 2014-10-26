@@ -261,3 +261,12 @@
         static jsUndefined = "Undefined";
     }
 }
+
+var num = [1, 2, 3];
+var it = new kcl.ArrayIterator(num);
+var r = kcl.Helpers.forEachAsync(it, (i: number) => { console.log(i * 2); });
+console.log(r);
+
+setTimeout(() => {
+    console.log(r);
+}, 15);

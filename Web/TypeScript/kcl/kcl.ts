@@ -281,7 +281,7 @@ var nums = [1, 2, 3, 4, 5];
 var it = new kcl.ArrayIterator(nums);
 var m = kcl.Helpers.mapAsync(it, (num: number) => {
     return num * 2;
-}, null);
+});
 
 console.log(m);
 

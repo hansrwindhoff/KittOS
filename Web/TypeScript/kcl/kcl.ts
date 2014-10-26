@@ -112,11 +112,11 @@
             return filtered;
         }
         static forEachAsync<T>(iterator: IIterator<T>, success: Function, failure?: Function, batchSizeMs?: number): IDeferred<number> {
-            var aBatch = kcl.Helpers.batch<number>(() => { // start async batch
+            var aBatch = Helpers.batch<number>(() => { // start async batch
                 if (iterator.hasNext) {
                     Helpers.nullApply(success, iterator.next()); // call success
                 } else {
-                    aBatch.status = kcl.DeferredStatus.Completed; // fulfill
+                    aBatch.status = DeferredStatus.Completed; // fulfill
                 }
 
                 return iterator.position;
@@ -261,12 +261,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var num = [1, 2, 3];
-var it = new kcl.ArrayIterator(num);
-var r = kcl.Helpers.forEachAsync(it, (i: number) => { console.log(i * 2); });
-console.log(r);
-
-setTimeout(() => {
-    console.log(r);
-}, 15);

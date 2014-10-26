@@ -186,8 +186,8 @@
 
             return mapped;
         }
-        static mapAsync<TInput, TOutput>(iterator: IIterator<TInput>, success: IMapper<TInput, TOutput>, failure?: Function, batchSizeMs?: number): IDeferred<Array<TOutput>> {
-            var aBatch = Helpers.batch<Array<TOutput>>(() => { // start async batch
+        static mapAsync<TInput, TResult>(iterator: IIterator<TInput>, success: IMapper<TInput, TResult>, failure?: Function, batchSizeMs?: number): IDeferred<Array<TResult>> {
+            var aBatch = Helpers.batch<Array<TResult>>(() => { // start async batch
                 if (iterator.hasNext) {
                     aBatch.value.push(Helpers.nullApply(success, iterator.next())); // call success and add result to batch array
                 } else {

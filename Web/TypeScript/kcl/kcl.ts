@@ -276,15 +276,3 @@
         static jsUndefined = "Undefined";
     }
 }
-
-var nums = [1, 2, 3, 4, 5];
-var it = new kcl.ArrayIterator(nums);
-var m = kcl.Helpers.mapAsync(it, (num: number) => {
-    return num * 2;
-});
-
-console.log(m);
-
-kcl.Helpers.defer(() => {
-    console.log(m);
-}, null, 1000);
